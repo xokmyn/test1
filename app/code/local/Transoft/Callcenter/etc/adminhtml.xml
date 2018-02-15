@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <transoft_callcenter translate="title">
+                        <title>Callcenter</title>
+                        <sort_order>70</sort_order>
+                        <children>
+                            <initiator>
+                                <title>Initiator</title>
+                                <children>
+                                    <actions translate="title">
+                                        <title>Actions</title>
+                                        <children>
+                                            <getorder translate="title">
+                                                <title>Get Order</title>
+                                                <sort_order>5</sort_order>
+                                            </getorder>
+                                            <removeinitiator translate="title">
+                                                <title>Remove Initiator</title>
+                                                <sort_order>10</sort_order>
+                                            </removeinitiator>
+                                        </children>
+                                    </actions>
+                                </children>
+                            </initiator>
+                        </children>
+                    </transoft_callcenter>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>
