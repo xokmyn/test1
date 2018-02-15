@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Transoft_Callcenter extension
+ * 
+ * NOTICE OF LICENSE
+ * 
+ * This source file is subject to the MIT License
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/mit-license.php
+ * 
+ * @category       Transoft
+ * @package        Transoft_Callcenter
+ * @copyright      Copyright (c) 2018
+ * @license        http://opensource.org/licenses/mit-license.php MIT License
+ */
+-->
+<config>
+    <modules>
+        <Transoft_Callcenter>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Mage_Admin />
+                <Mage_Catalog />
+                <Mage_Adminhtml />
+                <Mage_Sales />
+             </depends>
+        </Transoft_Callcenter>
+    </modules>
+</config>
