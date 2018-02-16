@@ -68,6 +68,6 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
     public function cronAssignmentOrderId($schedule)
     {
 
-        return $this;
+        return "Assignment Order for Callcenter User";
     }
 }

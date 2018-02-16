@@ -71,10 +71,14 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function getInitiatorOrderId()
     {
-        $orderId    = $this->_getRandomOrderId();
+        $orderId    = 0;//= $this->_getRandomOrderId();
         if($orderId && $this->_callcenterUser->getUserId())
         {
             $this->saveOrderInitiator($orderId);
+        }
+        else
+        {
+            $this->saveInitiatorPosition();
         }
 
         return $orderId;

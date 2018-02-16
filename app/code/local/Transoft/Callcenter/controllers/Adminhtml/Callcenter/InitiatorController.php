@@ -126,4 +126,14 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         }
         $this->_redirect('*/sales_order/');
     }
+
+    /**
+     * Redirect to sales order view action
+     *
+     * @access public
+     */
+    public function runCronAssignmentOrderIdAction()
+    {
+        return Mage::getModel("transoft_callcenter/adminhtml_observer")->cronAssignmentOrderId();
+    }
 }
