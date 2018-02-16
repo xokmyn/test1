@@ -72,7 +72,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     public function getInitiatorOrderId()
     {
         $orderId    = $this->_getRandomOrderId();
-        if($this->_callcenterUser->getUserId())
+        if($orderId && $this->_callcenterUser->getUserId())
         {
             $this->saveOrderInitiator($orderId);
         }
@@ -89,7 +89,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     {
         $orders = Mage::getResourceModel("transoft_callcenter/order_collection")
             ->addFieldToFilter('initiator_id', ['null' => true])
-            ->addFieldToFilter('status', 'new');;
+            ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);;
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {
             $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
