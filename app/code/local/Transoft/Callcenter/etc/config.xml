@@ -91,4 +91,16 @@
             </adminhtml>
         </routers>
     </admin>
+    <crontab>
+        <jobs>
+            <set_initiator_order_id>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>callcenter/adminhtml_observer::cronAssignmentOrderId</model>
+                </run>
+            </set_initiator_order_id>
+        </jobs>
+    </crontab>
 </config>

@@ -88,7 +88,8 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     protected function _getRandomOrderId()
     {
         $orders = Mage::getResourceModel("transoft_callcenter/order_collection")
-            ->addFieldToFilter('initiator_id', ['null' => true]);
+            ->addFieldToFilter('initiator_id', ['null' => true])
+            ->addFieldToFilter('status', 'new');;
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {
             $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
