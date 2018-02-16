@@ -73,7 +73,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             $this->_getSession()->addError(
                 Mage::helper('transoft_callcenter')->__('Нет свободних заказов.')
             );
-            $this->_redirect('*/*/');
+            $this->_redirect('*/sales_order/');
             return;
         }else
         {
@@ -125,5 +125,15 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             }
         }
         $this->_redirect('*/sales_order/');
+    }
+
+    /**
+     * Redirect to sales order view action
+     *
+     * @access public
+     */
+    public function runCronAssignmentOrderIdAction()
+    {
+        return Mage::getModel("transoft_callcenter/adminhtml_observer")->cronAssignmentOrderId();
     }
 }

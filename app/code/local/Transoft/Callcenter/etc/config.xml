@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Transoft_Callcenter>
-            <version>1.0.0</version>
+            <version>1.0.2</version>
         </Transoft_Callcenter>
     </modules>
     <global>
@@ -23,6 +23,7 @@
                     <sales_order_grid>Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
                     <sales_order_view>Transoft_Callcenter_Block_Adminhtml_Sales_Order_View</sales_order_view>
                     <sales_order>Transoft_Callcenter_Block_Adminhtml_Sales_Order</sales_order>
+                    <permissions_user_edit_tab_main>Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main</permissions_user_edit_tab_main>
                 </rewrite>
             </adminhtml>
         </blocks>
@@ -91,4 +92,16 @@
             </adminhtml>
         </routers>
     </admin>
+    <crontab>
+        <jobs>
+            <set_initiator_order_id>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>callcenter/adminhtml_observer::cronAssignmentOrderId</model>
+                </run>
+            </set_initiator_order_id>
+        </jobs>
+    </crontab>
 </config>
