@@ -68,19 +68,6 @@ $table = $this->getConnection()
         Varien_Db_Ddl_Table::ACTION_CASCADE,
         Varien_Db_Ddl_Table::ACTION_CASCADE
     )
-    ->addForeignKey(
-        $this->getFkName(
-            'transoft_callcenter/initiator_order',
-            'order_id',
-            $admin_user,
-            'user_id'
-        ),
-        'order_id',
-        $order_table,
-        'entity_id',
-        Varien_Db_Ddl_Table::ACTION_CASCADE,
-        Varien_Db_Ddl_Table::ACTION_CASCADE
-    )
     ->addIndex(
         $this->getIdxName(
             'transoft_callcenter/initiator_order',

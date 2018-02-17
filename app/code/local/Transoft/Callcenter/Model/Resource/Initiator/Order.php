@@ -23,11 +23,11 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
      * Save initiator - order relations
      *
      * @access public
-     * @param Transoft_Callcenter_Model_Initiator $initiator
+     * @param int $initiatorId
      * @param array $data
      * @return Transoft_Callcenter_Model_Resource_Initiator_Order
      */
-    public function saveInitiatorRelation($initiator, $data)
+    public function saveInitiatorRelation($initiatorId, $data)
     {
         if (!is_array($data)) {
             $data = array();
@@ -35,7 +35,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
 
         $adapter = $this->_getWriteAdapter();
         $bind    = array(
-            ':initiator_id'    => (int)$initiator->getId(),
+            ':initiator_id'    => (int)$initiatorId,
         );
         $select = $adapter->select()
             ->from($this->getMainTable(), array('rel_id', 'order_id'))
@@ -59,9 +59,9 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             $adapter->insertOnDuplicate(
                 $this->getMainTable(),
                 array(
-                    'initiator_id'      => $initiator->getId(),
-                    'order_id'     => $orderId,
-                    'position'      => @$info['position']
+                    'initiator_id'      => $initiatorId,
+                    'order_id'          => $orderId,
+                    'position'          => @$info['position']
                 ),
                 array('position')
             );
@@ -97,5 +97,24 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
         $orderIds   = $adapter->fetchPairs($select, $bind);
 
         return $orderIds;
+    }
+
+    /**
+     * Get last position for used order
+     *
+     * @return int
+    */
+    public function getLastPosition()
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('position'))
+            ->where('order_id = 0')
+            ->order('position DESC')
+            ->limit(1);
+
+        $position   = $adapter->fetchOne($select);
+
+        return $position;
     }
 }

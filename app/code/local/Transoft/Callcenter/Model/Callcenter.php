@@ -107,4 +107,39 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
 
         return $this;
     }
+
+    /**
+     * Save initiator - order relation
+     *
+     * @access public
+     * @param int $initiator_id
+     * @param int $position
+     * @return Transoft_Callcenter_Model_Callcenter
+     */
+    public function saveInitiatorPosition($initiator_id = 0, $position = 0)
+    {
+            $position = ($position) ? : $this->getNextPosition();
+            $initiator_id = ($initiator_id) ? : $this->_callcenterUser->getUserId();
+            $data[0] = array(
+                'position'      =>  $position
+            );
+
+            Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+                ->saveInitiatorRelation($initiator_id, $data);
+
+            return $this;
+    }
+
+    /**
+     * Get next position in queue for user
+     *
+     * @return int
+    */
+    protected function getNextPosition()
+    {
+        $lastPosition   = Mage::getResourceSingleton('transoft_callcenter/initiator_order')->getLastPosition();
+        $nextPosition   = $lastPosition + 1;
+
+        return $nextPosition;
+    }
 }
