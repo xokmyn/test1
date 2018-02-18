@@ -30,10 +30,13 @@ $attributeSet = Mage::getModel('eav/entity_attribute_set')
 $attributeSet->validate();
 $attributeSet->save();
 
+$installer  = new Mage_Eav_Model_Entity_Setup('core_setup');
+$skeletonID = $installer->getAttributeSetId('catalog_product','Default');
+$attributeSet->initFromSkeleton($skeletonID)->save();
+
 /**
  * Add new attribute to this new attribute set
 */
-$installer = new Mage_Eav_Model_Entity_Setup('core_setup');
 $installer->addAttribute('catalog_product', 'callcenter_format_type', array(
     'group'           => 'General',
     'label'           => 'Callcenter format type',

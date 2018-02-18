@@ -16,7 +16,8 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
             {
                 $pendingOrder   = $model->getPendingOrder()->getIncrementId();
                 $pendingOrderId = $model->getPendingOrder()->getId();
-                    Mage::getSingleton('core/session')
+
+                Mage::getSingleton('core/session')
                     ->addNotice(Mage::helper('transoft_callcenter')->__("У вас есть заказ #".$pendingOrder." из статусом pending !"));
 
                 $url = $this->getUrl('*/sales_order/view/', ['order_id' => $pendingOrderId]);
@@ -40,10 +41,24 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
                 ->initiatorStatusFilter(true);
             if($enabled_orderArr)
             {
+                $enabled_order = array_shift($enabled_orderArr);
+                if($enabled_order == 0)
+                {
+                    Mage::getSingleton('core/session')
+                        ->addNotice(Mage::helper('transoft_callcenter')->__('Вы находитесь в очереди на заказ!'));
+
+                    $url = $this->getUrl('*/sales_order/');
+
+                    $this->addButton('callcenter_initiator_get_order', array(
+                        'label'     => Mage::helper("transoft_callcenter")->__('Получить заказ'),
+                        'onclick'   => 'setLocation(\'' . $url . '\')',
+                        'class'     => 'add'
+                    ));
+
+                    return $this;
+                }
                 Mage::getSingleton('core/session')
                     ->addNotice(Mage::helper('transoft_callcenter')->__('У вас есть необработанний заказ!'));
-
-                $enabled_order = array_shift($enabled_orderArr);
                 $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabled_order]);
 
                 $this->addButton('callcenter_initiator_get_order', array(

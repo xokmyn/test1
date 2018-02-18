@@ -86,16 +86,21 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
      * @access public
      * @param int $orderId
      * @param bool $status
+     * @param int $initiatorId
      * @return Transoft_Callcenter_Model_Callcenter
      */
-    public function saveOrderInitiator($orderId, $status = true)
+    public function saveOrderInitiator($orderId, $status = true, $initiatorId = null)
     {
-        $data[$this->_callcenterUser->getUserId()] = array(
+        if(!$initiatorId)
+        {
+            $initiatorId = $this->_callcenterUser->getUserId();
+        }
+        $data[$initiatorId] = array(
             'status'        =>  $status,
         );
 
         Mage::dispatchEvent(
-            'transoftg_callcenter_adminhtml_order_initiator_save_before',
+            'transoft_callcenter_adminhtml_order_initiator_save_before',
             array(
                 'order' => $orderId,
                 'data'  => $data,
