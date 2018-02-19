@@ -38,7 +38,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             ':initiator_id'    => (int)$initiatorId,
         );
         $select = $adapter->select()
-            ->from($this->getMainTable(), array('rel_id', 'order_id'))
+            ->from($this->getMainTable(), array('rel_id'))
             ->where('initiator_id = :initiator_id');
 
         $related   = $adapter->fetchPairs($select, $bind);
@@ -100,6 +100,24 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
     }
 
     /**
+     * Get order ids with status " 1 "
+     *
+     * @access public
+     * @return array
+     */
+    public function getAllOrderIdsStatusEnabled()
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('order_id'))
+            ->where('status = 1');
+
+        $orderIds   = $adapter->fetchCol($select);
+
+        return $orderIds;
+    }
+
+    /**
      * Get last position for used order
      *
      * @return int
@@ -117,4 +135,52 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
 
         return $position;
     }
+
+    /**
+     * Get first user for order
+     *
+     * @param array $userIds
+     * @return array
+     */
+    public function getFirstPositionInitiator($userIds = [])
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('*'))
+            ->where('order_id = 0');
+        if($userIds)
+        {
+            $select->where('initiator_id IN (?)', $userIds);
+        }
+        $select->order('position ASC')
+            ->limit(1);
+
+        $data   = $adapter->fetchAll($select);
+
+        return $data;
+    }
+
+    /**
+     * Get initiators users
+     *
+     * @return array
+    */
+    public function getInitiatorsOrderWithType($userIds = [])
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('*'))
+            ->where('order_id = 0');
+        if($userIds)
+        {
+            $select->where('initiator_id IN (?)', $userIds);
+        }
+        $select->order('position ASC');
+        $select->joinLeft(array('admin' => "admin_user"), 'initiator_id = admin.user_id', array("callcenter_type"));
+
+        $data   = $adapter->fetchAll($select);
+
+        return $data;
+    }
+
 }

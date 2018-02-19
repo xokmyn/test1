@@ -99,7 +99,7 @@
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>callcenter/adminhtml_observer::cronAssignmentOrderId</model>
+                    <model>transoft_callcenter/adminhtml_observer::cronAssignmentOrderId</model>
                 </run>
             </set_initiator_order_id>
         </jobs>
