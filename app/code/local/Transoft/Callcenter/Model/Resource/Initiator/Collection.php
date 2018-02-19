@@ -18,4 +18,15 @@ class Transoft_Callcenter_Model_Resource_Initiator_Collection extends Mage_Core_
         parent::_construct();
         $this->_init('admin/user');
     }
+
+    /**
+     * Add filter "callcenter_type" to user
+     *
+     * @param int $type
+     * @return mixed
+    */
+    public function getUserIdsWithType($type)
+    {
+        return $this->addFieldToFilter('callcenter_type', $type);
+    }
 }

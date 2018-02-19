@@ -14,6 +14,8 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     protected $_orderInstance = null;
 
+    protected $_initiatorOrderData = [];
+
     /**
      * constructor
      *
@@ -71,7 +73,8 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function getInitiatorOrderId()
     {
-        $orderId    = 0;//= $this->_getRandomOrderId();
+        $this->saveInitiatorPosition();
+        /*$orderId = $this->_getRandomOrderId();
         if($orderId && $this->_callcenterUser->getUserId())
         {
             $this->saveOrderInitiator($orderId);
@@ -79,9 +82,9 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
         else
         {
             $this->saveInitiatorPosition();
-        }
+        }*/
 
-        return $orderId;
+        return $orderId = 0;
     }
 
     /**
@@ -93,7 +96,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     {
         $orders = Mage::getResourceModel("transoft_callcenter/order_collection")
             ->addFieldToFilter('initiator_id', ['null' => true])
-            ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);;
+            ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {
             $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
@@ -110,9 +113,25 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     protected function getExcludeOrderIds()
     {
-        $orderIds = $this->getOrderInstance()->initiatorOrdersIdsFilterStatus(true);
+        $orderIds = array_unique($this->getOrderInstance()->getAllOrderIdsStatusEnabled(true));
 
         return $orderIds;
+    }
+
+    /**
+     * Get order collection for using in callcenter
+    */
+    public function getNewOrderCollection()
+    {
+        $orders = Mage::getResourceModel("transoft_callcenter/order_collection")
+            ->addFieldToFilter('initiator_id', ['null' => true])
+            ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
+        $excludeIds = $this->getExcludeOrderIds();
+        if ($excludeIds) {
+            $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
+        }
+
+        return $orders;
     }
 
     /**
@@ -132,4 +151,103 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
         return $order;
     }
 
+    /**
+     * Add order with position for callcenter user
+     *
+     * @return array
+     */
+    public function getUserWithTypeInQueue()
+    {
+        $usersData   = Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+            ->getInitiatorsOrderWithType();
+
+        return $usersData;
+    }
+
+    /**
+     * Save order to initiator-order table
+     */
+    public function saveOrderWithProductSetToInitiator()
+    {
+        $users = $this->getUserWithTypeInQueue();
+        if($users)
+        {
+            $collection = $this->getNewOrderCollection();
+
+            $attributeSetId = Mage::getModel('eav/entity_attribute_set')
+                ->getCollection()
+                ->addFieldToFilter("attribute_set_name", 'Format type')
+                ->getFirstItem()
+                ->getAttributeSetId();
+
+            foreach ($users as $user)
+            {
+                $data  = [];
+                $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $user);
+                $data[$orderId]   = ['status' => true, 'position' => 1];
+                $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
+            }
+        }
+    }
+
+    /**
+     * Get order for user
+     *
+     * @param object $collection orders
+     * @param int $attributeSetId for product
+     * @param array $user
+     *
+     * @return int $order_id
+    */
+    protected function _getOrderForInitiator($collection, $attributeSetId, $user)
+    {
+        $type = $user['callcenter_type'];
+        foreach ($collection as $order) {
+            $order_id = $order->getId();
+            $order = Mage::getModel("sales/order")->load($order_id);
+            $ordered_items = $order->getAllItems();
+            foreach ($ordered_items as $item) {
+                $product = $item->getProduct();
+                $type_option = $product->getData("callcenter_format_type");
+                if ($product->getAttributeSetId() == $attributeSetId && $type_option == $type) {
+                    return $order_id;
+                } elseif(!$type) {
+                    return $order_id;
+                }
+            }
+        }
+    }
+
+    /**
+     * Save initiator order relation
+     *
+     * @param int $initiatorId
+     * @param array $data
+    */
+    protected function saveInitiatorOrderRelation($initiatorId, $data)
+    {
+        try{
+            Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+                ->saveInitiatorRelation($initiatorId, $data);
+        }catch (Exception $e)
+        {
+           Mage::Exception($e);
+        }
+    }
+
+    /**
+     * Get attribute options value
+     *
+     * @param string $option_code
+     * @return int||null
+    */
+    public function getTypeOptionValue($option_code)
+    {
+        $attribute_options = Mage::getModel("transoft_callcenter/initiator_type")
+            ->getAllOptions();
+        $attribute_options = Mage::helper("transoft_callcenter")->convertOptions($attribute_options);
+        $type_value = array_flip($attribute_options)[$option_code];
+
+        return $type_value;
+    }
 }

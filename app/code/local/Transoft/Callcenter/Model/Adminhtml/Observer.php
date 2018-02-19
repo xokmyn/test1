@@ -63,11 +63,11 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      * Assignment order ID to callcenter users
      *
      * @param Mage_Cron_Model_Schedule $schedule
-     * @return Transoft_Callcenter_Model_Adminhtml_Observer
      */
     public function cronAssignmentOrderId($schedule)
     {
+        Mage::getModel("transoft_callcenter/initiator")->saveOrderWithProductSetToInitiator();
 
-        return "Assignment Order for Callcenter User";
+        return $this;
     }
 }

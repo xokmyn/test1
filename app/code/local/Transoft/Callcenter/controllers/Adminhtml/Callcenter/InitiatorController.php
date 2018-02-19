@@ -71,7 +71,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         Mage::getSingleton('admin/session')->setCallcenterOrderId($orderId);
         if (!$orderId) {
             $this->_getSession()->addError(
-                Mage::helper('transoft_callcenter')->__('Нет свободних заказов.')
+                Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
             );
             $this->_redirect('*/sales_order/');
             return;
