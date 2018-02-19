@@ -6,9 +6,9 @@
 $this->startSetup();
 /**
  * Create relations table initiator-order
-*/
-$order_table    = Mage::getModel('sales/order')->getResource()->getTable('order');
-$admin_user     = Mage::getModel('admin/user')->getResource()->getTable('user');
+ */
+$order_table = Mage::getModel('sales/order')->getResource()->getTable('order');
+$admin_user = Mage::getModel('admin/user')->getResource()->getTable('user');
 $table = $this->getConnection()
     ->newTable($this->getTable('transoft_callcenter/initiator_order'))
     ->addColumn(
@@ -16,10 +16,10 @@ $table = $this->getConnection()
         Varien_Db_Ddl_Table::TYPE_INTEGER,
         null,
         array(
-            'unsigned'  => true,
-            'identity'  => true,
-            'nullable'  => false,
-            'primary'   => true,
+            'unsigned' => true,
+            'identity' => true,
+            'nullable' => false,
+            'primary' => true,
         ),
         'Relation ID'
     )
@@ -28,9 +28,9 @@ $table = $this->getConnection()
         Varien_Db_Ddl_Table::TYPE_INTEGER,
         null,
         array(
-            'unsigned'  => true,
-            'nullable'  => false,
-            'default'   => '0',
+            'unsigned' => true,
+            'nullable' => false,
+            'default' => '0',
         ),
         'Initiator ID'
     )
@@ -39,9 +39,9 @@ $table = $this->getConnection()
         Varien_Db_Ddl_Table::TYPE_INTEGER,
         null,
         array(
-            'unsigned'  => true,
-            'nullable'  => false,
-            'default'   => '0',
+            'unsigned' => true,
+            'nullable' => false,
+            'default' => '0',
         ),
         'Order ID'
     )
@@ -50,8 +50,8 @@ $table = $this->getConnection()
         Varien_Db_Ddl_Table::TYPE_SMALLINT,
         null,
         array(
-            'nullable'  => false,
-            'default'   => '1',
+            'nullable' => false,
+            'default' => '1',
         ),
         'Status'
     )
@@ -82,7 +82,7 @@ $this->getConnection()->createTable($table);
 
 /**
  * Add initiator_id Attribute to Orders
-*/
+ */
 $this->addAttribute('order', 'initiator_id', $this->getInitiatorIdAttributesData());
 
 /**
@@ -90,16 +90,13 @@ $this->addAttribute('order', 'initiator_id', $this->getInitiatorIdAttributesData
  */
 $roles = array(0 => 'Специалист колл-центра', 1 => 'Координатор колл-центра');
 $resources = $this->getDefaultRoles();
-foreach($roles as $k => $role){
-    try{
+foreach ($roles as $k => $role) {
+    try {
         $col = Mage::getModel('admin/role')->setRoleName($role)->setRoleType('G')->setTreeLevel(1)->save();
-        if($col->getRoleId()){
-            if($k == 0)
-            {
+        if ($col->getRoleId()) {
+            if ($k === 0) {
                 $resources = $this->getOrderResource();
-            }
-            elseif($k == 1)
-            {
+            } elseif ($k === 1) {
                 $resources = $this->getRemoveInitiatorResource();
             }
             Mage::getModel('admin/rules')
@@ -107,7 +104,7 @@ foreach($roles as $k => $role){
                 ->setResources($resources)
                 ->saveRel();
         }
-    }catch (Exception $e) {
+    } catch (Exception $e) {
         Mage::logException($e);
     }
 }

@@ -11,9 +11,9 @@
 $this->startSetup();
 
 $this->getConnection()->addColumn($this->getTable('transoft_callcenter/initiator_order'), 'position', array(
-    'type'      => Varien_Db_Ddl_Table::TYPE_INTEGER,
-    'default'   => 1,
-    'comment'   => 'Position'
+    'type' => Varien_Db_Ddl_Table::TYPE_INTEGER,
+    'default' => 1,
+    'comment' => 'Position'
 ));
 
 $this->endSetup();

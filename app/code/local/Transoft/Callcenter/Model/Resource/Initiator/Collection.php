@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Initiator collection resource model
  *
@@ -24,7 +25,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Collection extends Mage_Core_
      *
      * @param int $type
      * @return mixed
-    */
+     */
     public function getUserIdsWithType($type)
     {
         return $this->addFieldToFilter('callcenter_type', $type);

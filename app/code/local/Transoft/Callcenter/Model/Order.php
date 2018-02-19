@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Callcenter Order model
  *
@@ -31,17 +32,16 @@ class Transoft_Callcenter_Model_Order extends Transoft_Callcenter_Model_Callcent
      *
      * @param int||array $orderId
      * @return void
-    */
+     */
     public function removeInitiator($orderIds)
     {
-        $data = ["initiator_id" => NULL];
-        try{
+        $data = ['initiator_id' => null];
+        try {
             Mage::getResourceModel('transoft_callcenter/order')->updateOrderField($orderIds, $data);
             //remove from relation table
             Mage::getResourceSingleton('transoft_callcenter/order_initiator')
                 ->deleteOrderRelation($orderIds);
-        }catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Mage::logException($e);
         }
     }
@@ -53,8 +53,6 @@ class Transoft_Callcenter_Model_Order extends Transoft_Callcenter_Model_Callcent
      */
     protected function getDefaultData()
     {
-        $data = ['initiator_id' => NULL];
-
-        return $data;
+        return ['initiator_id' => null];
     }
 }
