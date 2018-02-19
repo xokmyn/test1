@@ -81,11 +81,6 @@ $table = $this->getConnection()
 $this->getConnection()->createTable($table);
 
 /**
- * Add initiator_id Attribute to Orders
- */
-$this->addAttribute('order', 'initiator_id', $this->getInitiatorIdAttributesData());
-
-/**
  * 2 Roles Creation
  */
 $roles = array(0 => 'Специалист колл-центра', 1 => 'Координатор колл-центра');

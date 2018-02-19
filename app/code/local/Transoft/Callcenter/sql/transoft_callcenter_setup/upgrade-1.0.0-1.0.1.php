@@ -25,7 +25,7 @@ $entityTypeId = Mage::getModel('catalog/product')
 
 $attributeSet = Mage::getModel('eav/entity_attribute_set')
     ->setEntityTypeId($entityTypeId)
-    ->setAttributeSetName("Format type");
+    ->setAttributeSetName('Format type');
 
 $attributeSet->validate();
 $attributeSet->save();

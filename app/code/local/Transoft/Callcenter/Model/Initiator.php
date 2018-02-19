@@ -181,9 +181,11 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
 
             foreach ($users as $user) {
                 $data = [];
-                $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $user);
+                $type = (int)$user['callcenter_type'];
+                $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $type) ? : 0;
                 $data[$orderId] = ['status' => true, 'position' => 1];
                 $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
+                $collection->removeItemByKey($orderId);
             }
         }
     }
@@ -193,23 +195,23 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      *
      * @param  Transoft_Callcenter_Model_Resource_Order_Collection $collection orders
      * @param int $attributeSetId for product
-     * @param array $user
+     * @param int $type
      *
      * @return int $order_id
      */
-    protected function _getOrderForInitiator($collection, $attributeSetId, $user)
+    protected function _getOrderForInitiator($collection, $attributeSetId, $type)
     {
-        $type = $user['callcenter_type'];
+
         foreach ($collection as $order) {
             $order_id = $order->getId();
+            if (!$type) {
+                return $order_id;
+            }
             $order = Mage::getModel('sales/order')->load($order_id);
             foreach ($order->getAllItems() as $item) {
                 $product = $item->getProduct();
                 if ((int)$product->getAttributeSetId() === (int)$attributeSetId
                     && (int)$product->getData('callcenter_format_type') === (int)$type) {
-                    return $order_id;
-                }
-                if (!$type) {
                     return $order_id;
                 }
             }

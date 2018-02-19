@@ -69,7 +69,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         // Set order_id in admin session
         Mage::getSingleton('admin/session')->setCallcenterOrderId($orderId);
         if (!$orderId) {
-            $this->_getSession()->addError(
+            $this->_getSession()->addNotice(
                 Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
             );
             $this->_redirect('*/sales_order/');
