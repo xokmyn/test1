@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Order - Initiator relation model
  *
@@ -14,7 +15,7 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
      * @return void
      * @see Mage_Core_Model_Resource_Abstract::_construct()
      */
-    protected function  _construct()
+    protected function _construct()
     {
         $this->_init('transoft_callcenter/order_initiator', 'rel_id');
     }
@@ -34,14 +35,14 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
         }
 
         $adapter = $this->_getWriteAdapter();
-        $bind    = array(
-            ':order_id'    => (int)$orderId,
+        $bind = array(
+            ':order_id' => (int)$orderId,
         );
         $select = $adapter->select()
             ->from($this->getMainTable(), array('rel_id', 'initiator_id'))
             ->where('order_id = :order_id');
 
-        $related   = $adapter->fetchPairs($select, $bind);
+        $related = $adapter->fetchPairs($select, $bind);
         $deleteIds = array();
         foreach ($related as $relId => $initiatorId) {
             if (!isset($data[$initiatorId])) {
@@ -59,9 +60,9 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
             $adapter->insertOnDuplicate(
                 $this->getMainTable(),
                 array(
-                    'order_id'      => $orderId,
-                    'initiator_id'     => $initiatorId,
-                    'status'      => @$info['status']
+                    'order_id' => $orderId,
+                    'initiator_id' => $initiatorId,
+                    'status' => @$info['status']
                 ),
                 array('status')
             );

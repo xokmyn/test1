@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Order resource model
  *
@@ -23,27 +24,24 @@ class Transoft_Callcenter_Model_Resource_Order extends Mage_Core_Model_Resource_
      *
      * @param array||int $orderIds
      * @param array $data format ["field" => "value" ]
-    */
-    public function updateOrderField($orderIds, $data = [])
+     */
+    public function updateOrderField($orderIds, array $data = [])
     {
-        if(empty($data))
-        {
+        if (empty($data)) {
             $data = $this->getDefaultData();
         }
-        if(!is_array($orderIds))
-        {
+        if (!is_array($orderIds)) {
             $orderIds = [$orderIds];
         }
-        try{
+        try {
             $adapter = $this->_getWriteAdapter();
-            $bind    = $data;
+            $bind = $data;
             $adapter->update(
                 $this->getMainTable(),
                 $bind,
                 array('entity_id IN (?)' => $orderIds)
             );
-        }catch (Exception $e)
-        {
+        } catch (Exception $e) {
             Mage::logException($e);
         }
     }
@@ -52,9 +50,9 @@ class Transoft_Callcenter_Model_Resource_Order extends Mage_Core_Model_Resource_
      * Get default data for flat order table with attribute initiator_id
      *
      * @return array
-    */
+     */
     protected function getDefaultData()
     {
-        return Mage::getModel("transoft_callcenter/order")->getDefaultData();
+        return Mage::getModel('transoft_callcenter/order')->getDefaultData();
     }
 }
