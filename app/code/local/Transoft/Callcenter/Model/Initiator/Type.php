@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Setting source type model for Callcenter_Initiator
  */
@@ -22,7 +23,7 @@ class Transoft_Callcenter_Model_Initiator_Type extends Mage_Eav_Model_Entity_Att
         }
 
         if ($withEmpty) {
-            array_unshift($options, array('value'=>'', 'label'=>''));
+            array_unshift($options, array('value' => '', 'label' => ''));
         }
         return $options;
     }
@@ -38,7 +39,7 @@ class Transoft_Callcenter_Model_Initiator_Type extends Mage_Eav_Model_Entity_Att
     {
         $options = $this->getAllOptions(false);
         foreach ($options as $item) {
-            if ($item['value'] == $value) {
+            if ($item['value'] === $value) {
                 return $item['label'];
             }
         }

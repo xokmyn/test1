@@ -16,29 +16,28 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function addInitiatorId($observer)
     {
-        if($this->_isCallcenter)
-        {
+        if ($this->_isCallcenter) {
             $order = $observer->getOrder();
-            if(!$order->getId())                                        // if order was reorder
-            {
+            /**
+             * if order was reorder
+            */
+            if (!$order->getId()) {
                 $orderId = Mage::getSingleton('admin/session')->getCallcenterOrderId();
-                Mage::getResourceModel("transoft_callcenter/order")
+                Mage::getResourceModel('transoft_callcenter/order')
                     ->updateOrderField($orderId, ['initiator_id' => $this->_callcenterUser->getUserId()]);
                 $this->saveOrderInitiator($orderId, false);
-            }else{
+            } else {
                 $orderId = $order->getId();
             }
-            if($this->checkIsOrderInInitiator($order) || !$order->getId())
-            {
+            if ($this->checkIsOrderInInitiator($order) || !$order->getId()) {
                 $order->setData('initiator_id', $this->_callcenterUser->getUserId());
-            }elseif($order->getInitiatorId() && $orderId)               //if initiator_id !== current callcenter user
-            {
+            } elseif ($order->getInitiatorId()) {       //if initiator_id !== current callcenter user
                 $user_id   = Mage::getSingleton('admin/session')->getUser()->getId();
                 $error_msg = Mage::helper('transoft_callcenter')->__('Не ваш заказ');
                 $error_log = '["user_id" => '.$user_id .', "order_id" => '.$orderId.']';
                 Mage::log($error_log, null, 'callcenter.log');
                 Mage::throwException($error_msg);
-            };
+            }
         }
     }
 
@@ -53,8 +52,7 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
     {
         $order = $observer->getOrder();
         $orderId = $order->getId();
-        if($orderId && $order->getInitiatorId() && $order->getStatus() !== 'pending')
-        {
+        if ($orderId && $order->getInitiatorId() && $order->getStatus() !== 'pending') {
             $this->saveOrderInitiator($orderId, false);
         }
     }
@@ -66,8 +64,6 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function cronAssignmentOrderId($schedule)
     {
-        Mage::getModel("transoft_callcenter/initiator")->saveOrderWithProductSetToInitiator();
-
-        return $this;
+        Mage::getModel('transoft_callcenter/initiator')->saveOrderWithProductSetToInitiator();
     }
 }

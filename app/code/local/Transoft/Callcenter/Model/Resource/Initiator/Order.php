@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Initiator - Order relation model
  *
@@ -14,7 +15,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
      * @return void
      * @see Mage_Core_Model_Resource_Abstract::_construct()
      */
-    protected function  _construct()
+    protected function _construct()
     {
         $this->_init('transoft_callcenter/initiator_order', 'rel_id');
     }
@@ -34,14 +35,14 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
         }
 
         $adapter = $this->_getWriteAdapter();
-        $bind    = array(
-            ':initiator_id'    => (int)$initiatorId,
+        $bind = array(
+            ':initiator_id' => (int)$initiatorId,
         );
         $select = $adapter->select()
             ->from($this->getMainTable(), array('rel_id'))
             ->where('initiator_id = :initiator_id');
 
-        $related   = $adapter->fetchPairs($select, $bind);
+        $related = $adapter->fetchPairs($select, $bind);
         $deleteIds = array();
         foreach ($related as $relId => $orderId) {
             if (!isset($data[$orderId])) {
@@ -59,9 +60,9 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             $adapter->insertOnDuplicate(
                 $this->getMainTable(),
                 array(
-                    'initiator_id'      => $initiatorId,
-                    'order_id'          => $orderId,
-                    'position'          => @$info['position']
+                    'initiator_id' => $initiatorId,
+                    'order_id' => $orderId,
+                    'position' => @$info['position']
                 ),
                 array('position')
             );
@@ -79,24 +80,20 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
     public function initiatorStatusFilter($checkStatus = false)
     {
         $bind = null;
-        $initiator_id   = Mage::getModel("transoft_callcenter/initiator")->getCallcenterUserId();
+        $initiator_id = Mage::getModel('transoft_callcenter/initiator')->getCallcenterUserId();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from($this->getMainTable(), array('rel_id', 'order_id'))
             ->where('status = 1');
 
-        if($checkStatus == true)
-        {
-            $bind    = array(
-                ':initiator_id'    => (int)$initiator_id,
+        if ($checkStatus === true) {
+            $bind = array(
+                ':initiator_id' => (int)$initiator_id,
             );
             $select->where('initiator_id = :initiator_id');
         }
 
-
-        $orderIds   = $adapter->fetchPairs($select, $bind);
-
-        return $orderIds;
+        return $adapter->fetchPairs($select, $bind);
     }
 
     /**
@@ -112,16 +109,14 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             ->from($this->getMainTable(), array('order_id'))
             ->where('status = 1');
 
-        $orderIds   = $adapter->fetchCol($select);
-
-        return $orderIds;
+        return  $adapter->fetchCol($select);
     }
 
     /**
      * Get last position for used order
      *
      * @return int
-    */
+     */
     public function getLastPosition()
     {
         $adapter = $this->_getReadAdapter();
@@ -131,9 +126,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             ->order('position DESC')
             ->limit(1);
 
-        $position   = $adapter->fetchOne($select);
-
-        return $position;
+        return $adapter->fetchOne($select);
     }
 
     /**
@@ -142,45 +135,45 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
      * @param array $userIds
      * @return array
      */
-    public function getFirstPositionInitiator($userIds = [])
+    public function getFirstPositionInitiator(array $userIds = [])
     {
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from($this->getMainTable(), array('*'))
             ->where('order_id = 0');
-        if($userIds)
-        {
+        if ($userIds) {
             $select->where('initiator_id IN (?)', $userIds);
         }
         $select->order('position ASC')
             ->limit(1);
 
-        $data   = $adapter->fetchAll($select);
-
-        return $data;
+        return  $adapter->fetchAll($select);
     }
 
     /**
      * Get initiators users
      *
+     * @param array $userIds
      * @return array
-    */
-    public function getInitiatorsOrderWithType($userIds = [])
+     */
+    public function getInitiatorsOrderWithType(array $userIds = [])
     {
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from($this->getMainTable(), array('*'))
             ->where('order_id = 0');
-        if($userIds)
-        {
+        if ($userIds) {
             $select->where('initiator_id IN (?)', $userIds);
         }
         $select->order('position ASC');
-        $select->joinLeft(array('admin' => "admin_user"), 'initiator_id = admin.user_id', array("callcenter_type"));
+        $select->joinLeft(
+            array(
+            'admin' => 'admin_user'
+            ),
+            'initiator_id = admin.user_id',
+            array('callcenter_type')
+        );
 
-        $data   = $adapter->fetchAll($select);
-
-        return $data;
+        return $adapter->fetchAll($select);
     }
-
 }

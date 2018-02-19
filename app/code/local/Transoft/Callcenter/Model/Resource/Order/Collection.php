@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Order collection resource model
  *

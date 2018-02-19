@@ -1,7 +1,11 @@
 <?php
 
-class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main extends  Mage_Adminhtml_Block_Permissions_User_Edit_Tab_Main
+class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main
+    extends Mage_Adminhtml_Block_Permissions_User_Edit_Tab_Main
 {
+    /**
+     * @return $this|Mage_Adminhtml_Block_Widget_Form
+     */
     protected function _prepareForm()
     {
         parent::_prepareForm();
@@ -13,15 +17,15 @@ class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main extends
         ));
 
         $fieldset->addField('callcenter_type', 'select', array(
-            'name'      => 'callcenter_type',
-            'label'     => Mage::helper('adminhtml')->__('Приоритет'),
-            'id'        => 'callcenter_type',
-            'title'     => Mage::helper('adminhtml')->__('Приоритет'),
-            'class'     => 'input-select',
-            'style'     => 'width: 80px',
-            'options'   => Mage::helper("transoft_callcenter")->convertOptions(
-                 Mage::getModel("transoft_callcenter/initiator_type")->getAllOptions(true)
-                )
+            'name' => 'callcenter_type',
+            'label' => Mage::helper('adminhtml')->__('Приоритет'),
+            'id' => 'callcenter_type',
+            'title' => Mage::helper('adminhtml')->__('Приоритет'),
+            'class' => 'input-select',
+            'style' => 'width: 80px',
+            'options' => Mage::helper('transoft_callcenter')->convertOptions(
+                Mage::getModel('transoft_callcenter/initiator_type')->getAllOptions(true)
+            )
         ));
 
         return $this;
