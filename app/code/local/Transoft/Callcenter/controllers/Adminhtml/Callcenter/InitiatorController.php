@@ -12,11 +12,11 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     {
         $action = strtolower($this->getRequest()->getActionName());
         switch ($action) {
-            case 'getorder':
-                $aclResource = 'transoft_callcenter/initiator/actions/getorder';
+            case 'getOrder':
+                $aclResource = 'transoft_callcenter/initiator/actions/getOrder';
                 break;
-            case 'removeinitiator':
-                $aclResource = 'transoft_callcenter/initiator/actions/removeinitiator';
+            case 'removeInitiator':
+                $aclResource = 'transoft_callcenter/initiator/actions/removeInitiator';
                 break;
             default:
                 $aclResource = 'transoft_callcenter/initiator';
@@ -34,7 +34,6 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     protected function _initInitiator()
     {
         $initiator = $this->_checkCallcenterUser() ? Mage::getModel('transoft_callcenter/initiator') : false;
-
         return $initiator;
     }
 
@@ -45,17 +44,15 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
      */
     protected function _checkCallcenterUser()
     {
-        $_isCallcenter = Mage::getModel('transoft_callcenter/initiator')->isCallcenterUser();
-
-        return $_isCallcenter;
+        /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        return $initiatorModel->isCallcenterUser();
     }
 
     /**
      * Redirect to sales order view action
-     *
-     * @access public
      */
-    public function getorderAction()
+    public function getOrderAction()
     {
         $initiator = $this->_initInitiator();
         if (!$initiator) {
@@ -81,12 +78,10 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
 
     /**
      * Remove initiator from order
-     *
-     * @access public
      */
-    public function removeinitiatorAction()
+    public function removeInitiatorAction()
     {
-        if ($orderId = $this->getRequest()->getParam('order_id')) {
+        if ($orderId = (int)$this->getRequest()->getParam('order_id')) {
             try {
                 Mage::getModel('transoft_callcenter/order')->removeInitiator($orderId);
                 $this->_getSession()->addSuccess(

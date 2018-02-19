@@ -60,7 +60,7 @@ class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource
             'admin/transoft_callcenter',
             'admin/transoft_callcenter/initiator',
             'admin/transoft_callcenter/initiator/actions',
-            'admin/transoft_callcenter/initiator/actions/getorder'
+            'admin/transoft_callcenter/initiator/actions/getOrder'
         ];
         $resources = array_merge($default, $resources);
         return $resources;
@@ -71,12 +71,18 @@ class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource
      */
     public function getRemoveInitiatorResource()
     {
-        $default = $this->getDefaultRoles();
+        $default = array(
+            0 => '__root__',
+            1 => 'admin/sales',
+            2 => 'admin/sales/order',
+            3 => 'admin/sales/order/actions',
+            4 => 'admin/sales/order/actions/view',
+        );
         $resources = [
             'admin/transoft_callcenter',
             'admin/transoft_callcenter/initiator',
             'admin/transoft_callcenter/initiator/actions',
-            'admin/transoft_callcenter/initiator/actions/removeinitiator'
+            'admin/transoft_callcenter/initiator/actions/removeInitiator'
         ];
         $resources = array_merge($default, $resources);
 

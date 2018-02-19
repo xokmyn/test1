@@ -17,7 +17,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_View extends Mage_Adminhtm
         $model = Mage::getModel('transoft_callcenter/initiator');
         if ($model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::COORDINATOR) {
             $url = $this->getUrl(
-                '*/callcenter_initiator/removeinitiator/',
+                '*/callcenter_initiator/removeInitiator/',
                 ['order_id' => Mage::registry('current_order')->getId()]
             );
             $this->_addButton('button_id', array(

@@ -11,7 +11,6 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
     /**
      * initialize resource model
      *
-     * @access protected
      * @return void
      * @see Mage_Core_Model_Resource_Abstract::_construct()
      */
@@ -23,7 +22,6 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
     /**
      * Save order - initiator relations
      *
-     * @access public
      * @param int $orderId
      * @param array $data
      * @return Transoft_Callcenter_Model_Resource_Order_Initiator
@@ -62,7 +60,7 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
                 array(
                     'order_id' => $orderId,
                     'initiator_id' => $initiatorId,
-                    'status' => @$info['status']
+                    'status' => isset($info['status']) ? $info['status'] : 1,
                 ),
                 array('status')
             );
@@ -73,7 +71,6 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
     /**
      * Delete order - initiator relations
      *
-     * @access public
      * @param array||int $orderIds
      * @return Transoft_Callcenter_Model_Resource_Order_Initiator
      */
@@ -92,5 +89,20 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
         return $this;
     }
 
+    /**
+     * Get order-initiator relation
+     * @param int $orderId
+     * @param int $initiatorId
+     * @return array
+    */
+    public function getOrderInitiatorRelation($orderId, $initiatorId)
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('rel_id', 'initiator_id', 'order_id'))
+            ->where('order_id = ?', (int)$orderId)
+            ->where('initiator_id = ?', (int)$initiatorId);
 
+        return $adapter->fetchAll($select);
+    }
 }

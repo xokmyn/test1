@@ -124,7 +124,6 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     public function getNewOrderCollection()
     {
         $orders = Mage::getResourceModel('transoft_callcenter/order_collection')
-            ->addFieldToFilter('initiator_id', ['null' => true])
             ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {

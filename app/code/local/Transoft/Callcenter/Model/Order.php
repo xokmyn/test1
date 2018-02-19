@@ -45,14 +45,4 @@ class Transoft_Callcenter_Model_Order extends Transoft_Callcenter_Model_Callcent
             Mage::logException($e);
         }
     }
-
-    /**
-     * Get default data for flat order table with field initiator_id
-     *
-     * @return array
-     */
-    protected function getDefaultData()
-    {
-        return ['initiator_id' => null];
-    }
 }

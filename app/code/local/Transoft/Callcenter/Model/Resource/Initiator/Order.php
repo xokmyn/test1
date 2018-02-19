@@ -62,7 +62,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
                 array(
                     'initiator_id' => $initiatorId,
                     'order_id' => $orderId,
-                    'position' => @$info['position']
+                    'position' => isset($info['position']) ? $info['position'] : 1,
                 ),
                 array('position')
             );
@@ -73,7 +73,6 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
     /**
      * Get order ids with status " 1 "
      *
-     * @access public
      * @param bool $checkStatus
      * @return array
      */
@@ -99,7 +98,6 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
     /**
      * Get order ids with status " 1 "
      *
-     * @access public
      * @return array
      */
     public function getAllOrderIdsStatusEnabled()
@@ -109,7 +107,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             ->from($this->getMainTable(), array('order_id'))
             ->where('status = 1');
 
-        return  $adapter->fetchCol($select);
+        return $adapter->fetchCol($select);
     }
 
     /**
@@ -130,27 +128,6 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
     }
 
     /**
-     * Get first user for order
-     *
-     * @param array $userIds
-     * @return array
-     */
-    public function getFirstPositionInitiator(array $userIds = [])
-    {
-        $adapter = $this->_getReadAdapter();
-        $select = $adapter->select()
-            ->from($this->getMainTable(), array('*'))
-            ->where('order_id = 0');
-        if ($userIds) {
-            $select->where('initiator_id IN (?)', $userIds);
-        }
-        $select->order('position ASC')
-            ->limit(1);
-
-        return  $adapter->fetchAll($select);
-    }
-
-    /**
      * Get initiators users
      *
      * @param array $userIds
@@ -168,7 +145,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
         $select->order('position ASC');
         $select->joinLeft(
             array(
-            'admin' => 'admin_user'
+                'admin' => 'admin_user'
             ),
             'initiator_id = admin.user_id',
             array('callcenter_type')

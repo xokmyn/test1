@@ -13,36 +13,14 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     {
         $model = Mage::getModel('transoft_callcenter/initiator');
         if ($model->isCallcenterUser()) {
-            //we can checked status order too
-            if ($model->getPendingOrder()->getId()) {
-                $pendingOrder = $model->getPendingOrder()->getIncrementId();
-                $pendingOrderId = $model->getPendingOrder()->getId();
-
-                Mage::getSingleton('core/session')
-                    ->addNotice(Mage::helper('transoft_callcenter')
-                        ->__('У вас есть заказ #' . $pendingOrder . ' из статусом pending !'));
-
-                $url = $this->getUrl('*/sales_order/view/', ['order_id' => $pendingOrderId]);
-
-                $this->addButton('callcenter_initiator_get_order', array(
-                    'label' => Mage::helper('transoft_callcenter')
-                        ->__('Получить свой заказ из статусом pending '),
-                    'onclick' => 'setLocation(\'' . $url . '\')',
-                    'class' => 'add'
-                ));
-
-                return $this;
-            }
-
-            $this->_addButton('callcenter_initiator_get_order', array(
+            $this->addButton('callcenter_initiator_get_order', array(
                 'label' => Mage::helper('transoft_callcenter')->__('Получить заказ'),
                 'onclick' => 'setLocation(\'' . $this->getOrderUrlForInitiator() . '\')',
                 'class' => 'add'
             ), 0, 100, 'header', 'header');
-
-            $enabled_orderArr = Mage::getResourceModel('transoft_callcenter/initiator_order')
+            $enabledOrderArr = Mage::getResourceModel('transoft_callcenter/initiator_order')
                 ->initiatorStatusFilter(true);
-            if ($enabled_orderArr) {
+            if ($enabledOrderArr) {
                 $enabled_order = (int)array_shift($enabled_orderArr);
                 if ($enabled_order === 0) {
                     Mage::getSingleton('core/session')
@@ -78,6 +56,6 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
      */
     public function getOrderUrlForInitiator()
     {
-        return $this->getUrl('*/callcenter_initiator/getorder/');
+        return $this->getUrl('*/callcenter_initiator/getOrder/');
     }
 }

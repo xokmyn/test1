@@ -2,14 +2,14 @@
 
 class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtml_Block_Sales_Order_Grid
 {
-
     protected $_isCallcenter;
 
     public function __construct()
     {
         parent::__construct();
-
-        $this->_isCallcenter = Mage::getModel('transoft_callcenter/initiator')->isCallcenterUser();
+        /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        $this->_isCallcenter = $initiatorModel->isCallcenterUser();
     }
 
     protected function _prepareCollection()
@@ -18,21 +18,13 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
             $model   = Mage::getModel('transoft_callcenter/initiator');
             $user_id = $model->getCallcenterUserId();
             $collection = Mage::getResourceModel($this->_getCollectionClass());
-
             //we changed mysql query, we added inner join to order item table
             $collection->join(
-                array('related' => 'sales/order'),
-                'related.entity_id = main_table.entity_id',
-                array('initiator_id'=>'initiator_id'),
-                null,
-                'left'
+                array('related' => 'transoft_callcenter/initiator_order'),
+                'related.order_id = main_table.entity_id AND related.initiator_id = '.$user_id,
+                array('initiator_id'=>'initiator_id')
             );
-            if ($model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
-                $collection->addFieldToFilter('initiator_id', $user_id);
-            }
-
             $this->setCollection($collection);
-
             //Call the grand parent instead of parent::_prepareCollection()
             return Mage_Adminhtml_Block_Widget_Grid::_prepareCollection();
         }
@@ -50,7 +42,6 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
                 'index' => 'initiator_id',
             ));
         }
-
         return parent::_prepareColumns();
     }
 
@@ -66,16 +57,14 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
             $this->setMassactionIdField('entity_id');
 
             if (Mage::getSingleton('admin/session')
-                ->isAllowed('transoft_callcenter/initiator/actions/removeinitiator')) {
+                ->isAllowed('transoft_callcenter/initiator/actions/removeInitiator')) {
                 $this->getMassactionBlock()->addItem('initiator_id', array(
                     'label'=> Mage::helper('transoft_callcenter')->__('Remove Initiator'),
                     'url'  => $this->getUrl('*/callcenter_initiator/massRemoveInitiator'),
                 ));
             }
-
             return $this;
         }
-
         return parent::_prepareMassaction();
     }
 }
