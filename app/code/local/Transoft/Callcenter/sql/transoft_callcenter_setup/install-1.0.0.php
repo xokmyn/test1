@@ -80,28 +80,4 @@ $table = $this->getConnection()
     ->setComment('Initiator to Order Linkage Table');
 $this->getConnection()->createTable($table);
 
-/**
- * 2 Roles Creation
- */
-$roles = array(0 => 'Специалист колл-центра', 1 => 'Координатор колл-центра');
-$resources = $this->getDefaultRoles();
-foreach ($roles as $k => $role) {
-    try {
-        $col = Mage::getModel('admin/role')->setRoleName($role)->setRoleType('G')->setTreeLevel(1)->save();
-        if ($col->getRoleId()) {
-            if ($k === 0) {
-                $resources = $this->getOrderResource();
-            } elseif ($k === 1) {
-                $resources = $this->getRemoveInitiatorResource();
-            }
-            Mage::getModel('admin/rules')
-                ->setRoleId($col->getRoleId())
-                ->setResources($resources)
-                ->saveRel();
-        }
-    } catch (Exception $e) {
-        Mage::logException($e);
-    }
-}
-
 $this->endSetup();

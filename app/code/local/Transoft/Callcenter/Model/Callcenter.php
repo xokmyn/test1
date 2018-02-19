@@ -70,7 +70,7 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
      */
     public function checkIsOrderInInitiator(Mage_Sales_Model_Order $order)
     {
-        $result = Mage::getResourceSingleton('transoft_callcenter/order_initiator')
+        $result = Mage::getResourceSingleton('transoft_callcenter/initiator_order')
             ->getOrderInitiatorRelation($order->getEntityId(), $this->_callcenterUser->getUserId()) ? true : false ;
         return $result;
     }
@@ -93,15 +93,7 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
             'status' => $status,
         );
 
-        Mage::dispatchEvent(
-            'transoft_callcenter_adminhtml_order_initiator_save_before',
-            array(
-                'order' => $orderId,
-                'data' => $data,
-            )
-        );
-
-        Mage::getResourceSingleton('transoft_callcenter/order_initiator')
+        Mage::getResourceSingleton('transoft_callcenter/initiator_order')
             ->saveOrderRelation($orderId, $data);
 
         return $this;

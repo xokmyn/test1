@@ -83,7 +83,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     {
         if ($orderId = (int)$this->getRequest()->getParam('order_id')) {
             try {
-                Mage::getModel('transoft_callcenter/order')->removeInitiator($orderId);
+                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderId);
                 $this->_getSession()->addSuccess(
                     Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
                 );
@@ -109,7 +109,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             $this->_getSession()->addError($this->__('Please select initiators.'));
         } else {
             try {
-                Mage::getModel('transoft_callcenter/order')->removeInitiator($orderIds);
+                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderIds);
                 $this->_getSession()->addSuccess(
                     Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
                 );

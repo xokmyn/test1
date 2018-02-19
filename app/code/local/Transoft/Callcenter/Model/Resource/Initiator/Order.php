@@ -38,6 +38,8 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             if ($orderId > 0) {
                 $bind = array(
                     'order_id' => (int)$orderId,
+                    'position' => isset($info['position']) ? $info['position'] : 1,
+                    'status'   => isset($info['status']) ? $info['status'] : 1
                 );
                 $adapter->update(
                     $this->getMainTable(),
@@ -50,7 +52,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
                     array(
                         'initiator_id' => $initiatorId,
                         'order_id' => $orderId,
-                        'position' => isset($info['position']) ?: 1,
+                        'position' => isset($info['position']) ? $info['position'] : 1,
                     ),
                     array('position')
                 );
@@ -68,14 +70,12 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
      */
     public function initiatorStatusFilter($initiatorId, $checkStatus = false)
     {
-        $bind = array(
-            ':initiator_id' => (int)$initiatorId,
-        );
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from($this->getMainTable(), array('order_id'))
-            ->where('status = ?', ($checkStatus) ? 1 : 0);
-        $result = $adapter->fetchOne($select, $bind);
+            ->where('status = ?', ($checkStatus) ? 1 : 0)
+            ->where('initiator_id = ?', $initiatorId);
+        $result = $adapter->fetchOne($select);
         $orderId = ($result !== false) ? $result : -1;
         return $orderId;
     }
@@ -135,6 +135,73 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             'initiator_id = admin.user_id',
             array('callcenter_type')
         );
+
+        return $adapter->fetchAll($select);
+    }
+
+    /**
+     * Save order - initiator relations
+     *
+     * @param int $orderId
+     * @param array $data
+     * @return Transoft_Callcenter_Model_Resource_Initiator_Order
+     */
+    public function saveOrderRelation($orderId, $data)
+    {
+        if (!is_array($data)) {
+            $data = array();
+        }
+        $adapter = $this->_getWriteAdapter();
+        foreach ($data as $initiatorId => $info) {
+            if ($orderId > 0) {
+                $bind = array(
+                    'status'   => 0,
+                    'position' => 1
+                );
+                $adapter->update(
+                    $this->getMainTable(),
+                    $bind,
+                    ['order_id = '.$orderId, 'initiator_id = '.$initiatorId]
+                );
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Delete order - initiator relations
+     *
+     * @param array||int $orderIds
+     * @return Transoft_Callcenter_Model_Resource_Initiator_Order
+     */
+    public function deleteOrderRelation($orderIds)
+    {
+        if (!is_array($orderIds)) {
+            $orderIds = [$orderIds];
+        }
+        $adapter = $this->_getWriteAdapter();
+        if (!empty($orderIds)) {
+            $adapter->delete(
+                $this->getMainTable(),
+                array('order_id IN (?)' => $orderIds)
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * Get order-initiator relation
+     * @param int $orderId
+     * @param int $initiatorId
+     * @return array
+     */
+    public function getOrderInitiatorRelation($orderId, $initiatorId)
+    {
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from($this->getMainTable(), array('rel_id', 'initiator_id', 'order_id'))
+            ->where('order_id = ?', (int)$orderId)
+            ->where('initiator_id = ?', (int)$initiatorId);
 
         return $adapter->fetchAll($select);
     }

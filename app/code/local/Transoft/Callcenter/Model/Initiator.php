@@ -9,15 +9,6 @@
 class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Callcenter
 {
     /**
-     * Parameter name in event
-     *
-     * @var string
-     */
-    protected $_orderInstance = null;
-
-    protected $_initiatorOrderData = [];
-
-    /**
      * constructor
      *
      * @access public
@@ -26,7 +17,6 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     public function _construct()
     {
         parent::_construct();
-        $this->_init('transoft_callcenter/initiator');
     }
 
     /**
@@ -54,23 +44,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     }
 
     /**
-     * get order relation model
-     *
-     * @access public
-     * @return Transoft_Callcenter_Model_Initiator_Order
-     */
-    public function getOrderInstance()
-    {
-        if (!$this->_orderInstance) {
-            $this->_orderInstance = Mage::getSingleton('transoft_callcenter/initiator_order');
-        }
-        return $this->_orderInstance;
-    }
-
-    /**
      * Get order id for initiator and save to relation table "transoft_callcenter_initiator_order"
-     *
-     * @return int
      */
     public function getInitiatorOrderId()
     {
@@ -78,31 +52,13 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     }
 
     /**
-     * Get random order with " initiator_id => null " filter
-     *
-     * @return int $order_id
-     */
-    protected function _getRandomOrderId()
-    {
-        $orders = Mage::getResourceModel('transoft_callcenter/order_collection')
-            ->addFieldToFilter('initiator_id', ['null' => true])
-            ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
-        $excludeIds = $this->getExcludeOrderIds();
-        if ($excludeIds) {
-            $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
-        }
-        $orders->getSelect()->order(new Zend_Db_Expr('RAND()'));
-        $orders->getSelect()->limit(1);
-
-        return (int)$orders->getColumnValues('entity_id')[0];
-    }
-
-    /**
      * Get order ids is from relation tables with status "1"
      */
     protected function getExcludeOrderIds()
     {
-        $orderIds = array_unique($this->getOrderInstance()->getAllOrderIdsStatusEnabled(true));
+        $orderIds = array_unique(
+            Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+            ->getAllOrderIdsStatusEnabled(true));
 
         return $orderIds;
     }
@@ -112,7 +68,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function getNewOrderCollection()
     {
-        $orders = Mage::getResourceModel('transoft_callcenter/order_collection')
+        $orders = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {
@@ -171,8 +127,11 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
                 $data = [];
                 $type = (int)$user['callcenter_type'];
                 $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $type) ? : 0;
-                $data[$orderId] = ['status' => true, 'position' => 1];
-                $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
+                if($orderId)
+                {
+                    $data[$orderId] = ['status' => true, 'position' => 1];
+                    $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
+                }
                 $collection->removeItemByKey($orderId);
             }
         }
@@ -181,7 +140,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     /**
      * Get order for user
      *
-     * @param  Transoft_Callcenter_Model_Resource_Order_Collection $collection orders
+     * @param  Mage_Sales_Model_Resource_Order_Collection $collection orders
      * @param int $attributeSetId for product
      * @param int $type
      *
@@ -234,5 +193,21 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
         $attribute_options = Mage::helper('transoft_callcenter')->convertOptions($attribute_options);
 
         return array_flip($attribute_options)[$option_code];
+    }
+
+    /**
+     * Set initiator_id for order to NULL
+     *
+     * @param int||array $orderId
+     * @return void
+     */
+    public function removeInitiator($orderIds)
+    {
+        try {
+            Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+                ->deleteOrderRelation($orderIds);
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
     }
 }
