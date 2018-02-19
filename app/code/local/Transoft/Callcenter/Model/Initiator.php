@@ -75,17 +75,6 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     public function getInitiatorOrderId()
     {
         $this->saveInitiatorPosition();
-        /*$orderId = $this->_getRandomOrderId();
-        if($orderId && $this->_callcenterUser->getUserId())
-        {
-            $this->saveOrderInitiator($orderId);
-        }
-        else
-        {
-            $this->saveInitiatorPosition();
-        }*/
-
-        return 0;
     }
 
     /**
@@ -200,7 +189,6 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     protected function _getOrderForInitiator($collection, $attributeSetId, $type)
     {
-
         foreach ($collection as $order) {
             $order_id = $order->getId();
             if (!$type) {

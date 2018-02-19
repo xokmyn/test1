@@ -137,7 +137,6 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
     protected function getNextPosition()
     {
         $lastPosition = Mage::getResourceSingleton('transoft_callcenter/initiator_order')->getLastPosition();
-
         return $lastPosition + 1;
     }
 }

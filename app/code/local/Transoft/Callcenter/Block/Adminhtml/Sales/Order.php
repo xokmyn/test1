@@ -11,41 +11,27 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
 
     protected function checkAndAddButtons()
     {
-        $model = Mage::getModel('transoft_callcenter/initiator');
+        $model       = Mage::getModel('transoft_callcenter/initiator');
         if ($model->isCallcenterUser()) {
-            $this->addButton('callcenter_initiator_get_order', array(
-                'label' => Mage::helper('transoft_callcenter')->__('Получить заказ'),
-                'onclick' => 'setLocation(\'' . $this->getOrderUrlForInitiator() . '\')',
-                'class' => 'add'
-            ), 0, 100, 'header', 'header');
-            $enabledOrderArr = Mage::getResourceModel('transoft_callcenter/initiator_order')
-                ->initiatorStatusFilter(true);
-            if ($enabledOrderArr) {
-                $enabled_order = (int)array_shift($enabled_orderArr);
-                if ($enabled_order === 0) {
-                    Mage::getSingleton('core/session')
-                        ->addNotice(Mage::helper('transoft_callcenter')->__('Вы находитесь в очереди на заказ!'));
-
-                    $url = $this->getUrl('*/sales_order/');
-
-                    $this->addButton('callcenter_initiator_get_order', array(
-                        'label' => Mage::helper('transoft_callcenter')->__('Получить заказ'),
-                        'onclick' => 'setLocation(\'' . $url . '\')',
-                        'class' => 'add'
-                    ));
-
-                    return $this;
-                }
-                Mage::getSingleton('core/session')
-                    ->addNotice(Mage::helper('transoft_callcenter')->__('У вас есть необработанний заказ!'));
-                $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabled_order]);
-
-                $this->addButton('callcenter_initiator_get_order', array(
-                    'label' => Mage::helper('transoft_callcenter')->__('Получить необработанний заказ'),
-                    'onclick' => 'setLocation(\'' . $url . '\')',
-                    'class' => 'add'
-                ));
+            $buttonData = $this->getButtonData();
+            $enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
+                ->initiatorStatusFilter($model->getCallcenterUserId(), true);
+            if ($enabledOrderId === 0) {
+                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('В ожидание заказа');
+                $buttonData['class'] = 'disabled';
+                unset($buttonData['onclick']);
+            } elseif($enabledOrderId > 0) {
+                $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabledOrderId]);
+                $buttonData['onclick'] = 'setLocation(\'' . $url . '\')';
+                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Получить необработанний заказ');
             }
+            $this->addButton(
+                'callcenter_initiator_get_order',
+                $buttonData,
+                0,
+                100,
+                'header'
+            );
         }
     }
 
@@ -57,5 +43,19 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     public function getOrderUrlForInitiator()
     {
         return $this->getUrl('*/callcenter_initiator/getOrder/');
+    }
+
+    /**
+     * Get button data
+     *
+     * @return array
+    */
+    public function getButtonData()
+    {
+        return [
+            'label'   =>  Mage::helper('transoft_callcenter')->__('Получить заказ'),
+            'onclick' => 'setLocation(\'' . $this->getOrderUrlForInitiator() . '\')',
+            'class'   => 'add',
+        ];
     }
 }

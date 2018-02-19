@@ -45,7 +45,7 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
     {
         $order = $observer->getOrder();
         $orderId = $order->getId();
-        if ($orderId && $order->getInitiatorId() && $order->getStatus() !== 'pending') {
+        if ($orderId && $order->getStatus() !== 'pending') {
             $this->saveOrderInitiator($orderId, false);
         }
     }

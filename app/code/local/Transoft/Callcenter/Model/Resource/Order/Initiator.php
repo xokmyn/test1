@@ -31,39 +31,19 @@ class Transoft_Callcenter_Model_Resource_Order_Initiator extends Mage_Core_Model
         if (!is_array($data)) {
             $data = array();
         }
-
         $adapter = $this->_getWriteAdapter();
-        $bind = array(
-            ':order_id' => (int)$orderId,
-        );
-        $select = $adapter->select()
-            ->from($this->getMainTable(), array('rel_id', 'initiator_id'))
-            ->where('order_id = :order_id');
-
-        $related = $adapter->fetchPairs($select, $bind);
-        $deleteIds = array();
-        foreach ($related as $relId => $initiatorId) {
-            if (!isset($data[$initiatorId])) {
-                $deleteIds[] = (int)$relId;
-            }
-        }
-        if (!empty($deleteIds)) {
-            $adapter->delete(
-                $this->getMainTable(),
-                array('rel_id IN (?)' => $deleteIds)
-            );
-        }
-
         foreach ($data as $initiatorId => $info) {
-            $adapter->insertOnDuplicate(
-                $this->getMainTable(),
-                array(
-                    'order_id' => $orderId,
-                    'initiator_id' => $initiatorId,
-                    'status' => isset($info['status']) ? $info['status'] : 1,
-                ),
-                array('status')
-            );
+            if ($orderId > 0) {
+                $bind = array(
+                    'status'   => 0,
+                    'position' => 1
+                );
+                $adapter->update(
+                    $this->getMainTable(),
+                    $bind,
+                    ['order_id = '.$orderId, 'initiator_id = '.$initiatorId]
+                );
+            }
         }
         return $this;
     }

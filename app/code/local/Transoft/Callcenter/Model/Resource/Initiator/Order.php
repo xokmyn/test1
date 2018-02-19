@@ -33,66 +33,51 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
         if (!is_array($data)) {
             $data = array();
         }
-
         $adapter = $this->_getWriteAdapter();
-        $bind = array(
-            ':initiator_id' => (int)$initiatorId,
-        );
-        $select = $adapter->select()
-            ->from($this->getMainTable(), array('rel_id'))
-            ->where('initiator_id = :initiator_id');
-
-        $related = $adapter->fetchPairs($select, $bind);
-        $deleteIds = array();
-        foreach ($related as $relId => $orderId) {
-            if (!isset($data[$orderId])) {
-                $deleteIds[] = (int)$relId;
-            }
-        }
-        if (!empty($deleteIds)) {
-            $adapter->delete(
-                $this->getMainTable(),
-                array('rel_id IN (?)' => $deleteIds)
-            );
-        }
-
         foreach ($data as $orderId => $info) {
-            $adapter->insertOnDuplicate(
-                $this->getMainTable(),
-                array(
-                    'initiator_id' => $initiatorId,
-                    'order_id' => $orderId,
-                    'position' => isset($info['position']) ? $info['position'] : 1,
-                ),
-                array('position')
-            );
+            if ($orderId > 0) {
+                $bind = array(
+                    'order_id' => (int)$orderId,
+                );
+                $adapter->update(
+                    $this->getMainTable(),
+                    $bind,
+                    ['order_id = 0', 'initiator_id = '.$initiatorId]
+                );
+            } else {
+                $adapter->insertOnDuplicate(
+                    $this->getMainTable(),
+                    array(
+                        'initiator_id' => $initiatorId,
+                        'order_id' => $orderId,
+                        'position' => isset($info['position']) ?: 1,
+                    ),
+                    array('position')
+                );
+            }
         }
         return $this;
     }
 
     /**
-     * Get order ids with status " 1 "
+     * Get order id with status " 1 " for initiator
      *
+     * @param int $initiatorId
      * @param bool $checkStatus
-     * @return array
+     * @return int
      */
-    public function initiatorStatusFilter($checkStatus = false)
+    public function initiatorStatusFilter($initiatorId, $checkStatus = false)
     {
-        $bind = null;
-        $initiator_id = Mage::getModel('transoft_callcenter/initiator')->getCallcenterUserId();
+        $bind = array(
+            ':initiator_id' => (int)$initiatorId,
+        );
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
-            ->from($this->getMainTable(), array('rel_id', 'order_id'))
-            ->where('status = 1');
-
-        if ($checkStatus === true) {
-            $bind = array(
-                ':initiator_id' => (int)$initiator_id,
-            );
-            $select->where('initiator_id = :initiator_id');
-        }
-
-        return $adapter->fetchPairs($select, $bind);
+            ->from($this->getMainTable(), array('order_id'))
+            ->where('status = ?', ($checkStatus) ? 1 : 0);
+        $result = $adapter->fetchOne($select, $bind);
+        $orderId = ($result !== false) ? $result : -1;
+        return $orderId;
     }
 
     /**

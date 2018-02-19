@@ -13,10 +13,10 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         $action = strtolower($this->getRequest()->getActionName());
         switch ($action) {
             case 'getOrder':
-                $aclResource = 'transoft_callcenter/initiator/actions/getOrder';
+                $aclResource = 'transoft_callcenter/initiator/actions/getorder';
                 break;
             case 'removeInitiator':
-                $aclResource = 'transoft_callcenter/initiator/actions/removeInitiator';
+                $aclResource = 'transoft_callcenter/initiator/actions/removeinitiator';
                 break;
             default:
                 $aclResource = 'transoft_callcenter/initiator';

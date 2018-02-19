@@ -60,7 +60,7 @@ class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource
             'admin/transoft_callcenter',
             'admin/transoft_callcenter/initiator',
             'admin/transoft_callcenter/initiator/actions',
-            'admin/transoft_callcenter/initiator/actions/getOrder'
+            'admin/transoft_callcenter/initiator/actions/getorder'
         ];
         $resources = array_merge($default, $resources);
         return $resources;
@@ -82,7 +82,7 @@ class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource
             'admin/transoft_callcenter',
             'admin/transoft_callcenter/initiator',
             'admin/transoft_callcenter/initiator/actions',
-            'admin/transoft_callcenter/initiator/actions/removeInitiator'
+            'admin/transoft_callcenter/initiator/actions/removeinitiator'
         ];
         $resources = array_merge($default, $resources);
 
