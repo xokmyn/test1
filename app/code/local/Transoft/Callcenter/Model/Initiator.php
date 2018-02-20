@@ -44,9 +44,9 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     }
 
     /**
-     * Get order id for initiator and save to relation table "transoft_callcenter_initiator_order"
+     * Save initiator to relation table "transoft_callcenter_initiator_order" with position value
      */
-    public function getInitiatorOrderId()
+    public function addInitiatorToPosition()
     {
         $this->saveInitiatorPosition();
     }
@@ -58,7 +58,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     {
         $orderIds = array_unique(
             Mage::getResourceSingleton('transoft_callcenter/initiator_order')
-            ->getAllOrderIdsStatusEnabled(true)
+                ->getAllOrderIdsStatusEnabled(true)
         );
         return $orderIds;
     }
@@ -126,9 +126,8 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
             foreach ($users as $user) {
                 $data = [];
                 $type = (int)$user['callcenter_type'];
-                $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $type) ? : 0;
-                if($orderId)
-                {
+                $orderId = $this->_getOrderForInitiator($collection, $attributeSetId, $type) ?: 0;
+                if ($orderId) {
                     $data[$orderId] = ['status' => true, 'position' => 1];
                     $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
                 }
