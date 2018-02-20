@@ -162,6 +162,16 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
                     $bind,
                     ['order_id = '.$orderId, 'initiator_id = '.$initiatorId]
                 );
+            } else {
+                $adapter->insertOnDuplicate(
+                    $this->getMainTable(),
+                    array(
+                        'initiator_id' => $initiatorId,
+                        'order_id' => $orderId,
+                        'position' => isset($info['position']) ? $info['position'] : 1,
+                    ),
+                    array('position')
+                );
             }
         }
         return $this;

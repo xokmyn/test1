@@ -4,31 +4,7 @@
  * add new attribute to product
  * add new attribute set with new attribute
  */
-
 $this->startSetup();
-/**
- * 2 Roles Creation
- */
-$roles = array(0 => 'Специалист колл-центра', 1 => 'Координатор колл-центра');
-$resources = $this->getDefaultRoles();
-foreach ($roles as $k => $role) {
-    try {
-        $col = Mage::getModel('admin/role')->setRoleName($role)->setRoleType('G')->setTreeLevel(1)->save();
-        if ($col->getRoleId()) {
-            if ($k === 0) {
-                $resources = $this->getOrderResource();
-            } elseif ($k === 1) {
-                $resources = $this->getRemoveInitiatorResource();
-            }
-            Mage::getModel('admin/rules')
-                ->setRoleId($col->getRoleId())
-                ->setResources($resources)
-                ->saveRel();
-        }
-    } catch (Exception $e) {
-        Mage::logException($e);
-    }
-}
 
 /**
  * Add new column to admin_user table

@@ -62,6 +62,10 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             $this->_redirect('*/*/');
             return;
         }
+        /**
+         * Add initiator to queue
+        */
+        $initiator->addInitiatorToPosition();
         $this->_getSession()->addNotice(
             Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
         );
