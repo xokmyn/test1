@@ -3,29 +3,6 @@
 class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource_Setup
 {
     /**
-     * Get "initiator_id" attributes data
-     *
-     * @access public
-     * @return array
-     */
-    public function getInitiatorIdAttributesData()
-    {
-        $data = [
-            'input' => 'text',
-            'type' => 'int',
-            'label' => 'Initiator ID',
-            'source' => 'transoft_callcenter/initiator_source',
-            'required' => false,
-            'visible' => true,
-            'user_defined' => true,
-            //'grid'          => true,    //add to sales_flat_order_grid
-            'visible_on_front' => false,
-        ];
-
-        return $data;
-    }
-
-    /**
      * Get default array with actions for using in Transoft_Callcenter
      */
     public function getDefaultRoles()
@@ -94,8 +71,20 @@ class Transoft_Callcenter_Model_Resource_Setup extends Mage_Sales_Model_Resource
      */
     public function getRemoveInitiatorResource()
     {
-        $resources = $this->getOrderResource();
-        $resources[] = 'admin/transoft_callcenter/initiator/actions/removeinitiator';
+        $default = array(
+            0 => '__root__',
+            1 => 'admin/sales',
+            2 => 'admin/sales/order',
+            3 => 'admin/sales/order/actions',
+            4 => 'admin/sales/order/actions/view',
+        );
+        $resources = [
+            'admin/transoft_callcenter',
+            'admin/transoft_callcenter/initiator',
+            'admin/transoft_callcenter/initiator/actions',
+            'admin/transoft_callcenter/initiator/actions/removeinitiator'
+        ];
+        $resources = array_merge($default, $resources);
 
         return $resources;
     }
