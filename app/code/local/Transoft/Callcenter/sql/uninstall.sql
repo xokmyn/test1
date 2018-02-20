@@ -2,4 +2,3 @@
 DROP TABLE IF EXISTS transoft_callcenter_initiator_order;
 DELETE FROM core_resource WHERE code = 'transoft_callcenter_setup';
 DELETE FROM core_config_data WHERE path like 'transoft_callcenter/%';
-ALTER TABLE sales_flat_order DROP COLUMN initiator_id;

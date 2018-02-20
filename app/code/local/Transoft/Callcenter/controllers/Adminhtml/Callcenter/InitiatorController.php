@@ -12,10 +12,10 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     {
         $action = strtolower($this->getRequest()->getActionName());
         switch ($action) {
-            case 'getorder':
+            case 'getOrder':
                 $aclResource = 'transoft_callcenter/initiator/actions/getorder';
                 break;
-            case 'removeinitiator':
+            case 'removeInitiator':
                 $aclResource = 'transoft_callcenter/initiator/actions/removeinitiator';
                 break;
             default:
@@ -34,7 +34,6 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     protected function _initInitiator()
     {
         $initiator = $this->_checkCallcenterUser() ? Mage::getModel('transoft_callcenter/initiator') : false;
-
         return $initiator;
     }
 
@@ -45,17 +44,15 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
      */
     protected function _checkCallcenterUser()
     {
-        $_isCallcenter = Mage::getModel('transoft_callcenter/initiator')->isCallcenterUser();
-
-        return $_isCallcenter;
+        /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        return $initiatorModel->isCallcenterUser();
     }
 
     /**
      * Redirect to sales order view action
-     *
-     * @access public
      */
-    public function getorderAction()
+    public function getOrderAction()
     {
         $initiator = $this->_initInitiator();
         if (!$initiator) {
@@ -65,30 +62,20 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             $this->_redirect('*/*/');
             return;
         }
-        $orderId = $initiator->getInitiatorOrderId();
-        // Set order_id in admin session
-        Mage::getSingleton('admin/session')->setCallcenterOrderId($orderId);
-        if (!$orderId) {
-            $this->_getSession()->addError(
-                Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
-            );
-            $this->_redirect('*/sales_order/');
-            return;
-        }
-
-        $this->_redirect('*/sales_order/view/', ['order_id' => $orderId]);
+        $this->_getSession()->addNotice(
+            Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
+        );
+        $this->_redirect('*/sales_order/');
     }
 
     /**
      * Remove initiator from order
-     *
-     * @access public
      */
-    public function removeinitiatorAction()
+    public function removeInitiatorAction()
     {
-        if ($orderId = $this->getRequest()->getParam('order_id')) {
+        if ($orderId = (int)$this->getRequest()->getParam('order_id')) {
             try {
-                Mage::getModel('transoft_callcenter/order')->removeInitiator($orderId);
+                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderId);
                 $this->_getSession()->addSuccess(
                     Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
                 );
@@ -114,7 +101,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
             $this->_getSession()->addError($this->__('Please select initiators.'));
         } else {
             try {
-                Mage::getModel('transoft_callcenter/order')->removeInitiator($orderIds);
+                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderIds);
                 $this->_getSession()->addSuccess(
                     Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
                 );

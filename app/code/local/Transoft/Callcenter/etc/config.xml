@@ -43,9 +43,6 @@
                     <initiator_order>
                         <table>transoft_callcenter_initiator_order</table>
                     </initiator_order>
-                    <order_initiator>
-                        <table>transoft_callcenter_initiator_order</table>
-                    </order_initiator>
                 </entities>
             </transoft_callcenter_resource>
         </models>
@@ -73,11 +70,11 @@
         </events>
         <translate>
             <modules>
-                <Transoftgroup_Callcenter>
+                <Transoft_Callcenter>
                     <files>
-                        <default>Transoftg_Callcenter.csv</default>
+                        <default>Transoft_Callcenter.csv</default>
                     </files>
-                </Transoftgroup_Callcenter>
+                </Transoft_Callcenter>
             </modules>
         </translate>
     </adminhtml>
