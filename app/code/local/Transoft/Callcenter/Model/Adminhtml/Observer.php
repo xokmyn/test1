@@ -25,11 +25,13 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
              * if order was reorder
             */
             if (!$orderId) {
-                $enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
+                /*$enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
                     ->initiatorStatusFilter($userId, true);
-                $this->saveOrderInitiator($enabledOrderId, false, $userId);
+                $this->saveOrderInitiator($enabledOrderId, true, $userId);*/
+                $this->saveOrderInitiator(0, true, $userId);
+                $order->setData('callcenter_user', $userId);
             }
-            if (!$this->checkIsOrderInInitiator($order)) {
+            if ($orderId && !$this->checkIsOrderInInitiator($order)) {
                 $error_msg = Mage::helper('transoft_callcenter')->__('Не ваш заказ');
                 $error_log = '["user_id" => '.$userId .', "order_id" => '.$orderId.']';
                 Mage::log($error_log, null, 'callcenter.log');
@@ -46,10 +48,19 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function afterSaveOrder($observer)
     {
-        $order = $observer->getOrder();
-        $orderId = $order->getId();
-        if ($orderId && $order->getStatus() !== 'pending') {
-            $this->saveOrderInitiator($orderId, false);
+        if ($this->_isCallcenter) {
+            $order = $observer->getOrder();
+            $orderId = $order->getId();
+            if ($orderId && $order->getStatus() !== 'pending') {
+                $this->saveOrderInitiator($orderId, false);
+            } elseif ($order->getData('callcenter_user')) {
+                /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+                $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+                $userId = $initiatorModel->getCallcenterUserId();
+                $data[$orderId] = ['status' => true, 'position' => 1];
+                Mage::getResourceSingleton('transoft_callcenter/initiator_order')
+                    ->saveInitiatorRelation($userId, $data);
+            }
         }
     }
 
