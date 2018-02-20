@@ -21,7 +21,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
                 $buttonData['label']   = Mage::helper('transoft_callcenter')->__('В ожидание заказа');
                 $buttonData['class'] = 'disabled';
                 unset($buttonData['onclick']);
-            } elseif($enabledOrderId > 0) {
+            } elseif ($enabledOrderId > 0) {
                 $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabledOrderId]);
                 $buttonData['onclick'] = 'setLocation(\'' . $url . '\')';
                 $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Получить необработанний заказ');

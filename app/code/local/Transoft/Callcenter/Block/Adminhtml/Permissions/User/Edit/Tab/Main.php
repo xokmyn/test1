@@ -10,12 +10,10 @@ class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main
     {
         parent::_prepareForm();
         $form = $this->getForm();
-
         $fieldset = $form->addFieldset('priority', array(
             'legend' => Mage::helper('adminhtml')->__('Приоритет пользователя'),
             'class' => 'fieldset-wide'
         ));
-
         $fieldset->addField('callcenter_type', 'select', array(
             'name' => 'callcenter_type',
             'label' => Mage::helper('transoft_callcenter')->__('Приоритет'),
@@ -26,7 +24,6 @@ class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main
             'options' => $this->getCallcenterTypeOptions(),
             'value'   => $this->getCallcenterTypeValue()
         ));
-
         return $this;
     }
 
@@ -36,7 +33,8 @@ class Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main
     public function getCallcenterTypeOptions()
     {
         $options = Mage::helper('transoft_callcenter')->convertOptions(
-            Mage::getModel('transoft_callcenter/initiator_type')->getAllOptions(true));
+            Mage::getModel('transoft_callcenter/initiator_type')->getAllOptions(true)
+        );
         return $options;
     }
 

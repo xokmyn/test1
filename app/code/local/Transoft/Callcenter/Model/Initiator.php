@@ -58,8 +58,8 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     {
         $orderIds = array_unique(
             Mage::getResourceSingleton('transoft_callcenter/initiator_order')
-            ->getAllOrderIdsStatusEnabled(true));
-
+            ->getAllOrderIdsStatusEnabled(true)
+        );
         return $orderIds;
     }
 

@@ -18,17 +18,20 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
         if ($this->_isCallcenter) {
             $order = $observer->getOrder();
             $orderId = $order->getId();
+            /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $userId = $initiatorModel->getCallcenterUserId();
             /**
              * if order was reorder
             */
             if (!$orderId) {
-                $orderId = Mage::getSingleton('admin/session')->getCallcenterOrderId();
-                $this->saveOrderInitiator($orderId, false);
+                $enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
+                    ->initiatorStatusFilter($userId, true);
+                $this->saveOrderInitiator($enabledOrderId, false, $userId);
             }
             if (!$this->checkIsOrderInInitiator($order)) {
-                $user_id   = Mage::getSingleton('admin/session')->getUser()->getId();
                 $error_msg = Mage::helper('transoft_callcenter')->__('Не ваш заказ');
-                $error_log = '["user_id" => '.$user_id .', "order_id" => '.$orderId.']';
+                $error_log = '["user_id" => '.$userId .', "order_id" => '.$orderId.']';
                 Mage::log($error_log, null, 'callcenter.log');
                 Mage::throwException($error_msg);
             }

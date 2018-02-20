@@ -76,8 +76,7 @@ class Transoft_Callcenter_Model_Resource_Initiator_Order extends Mage_Core_Model
             ->where('status = ?', ($checkStatus) ? 1 : 0)
             ->where('initiator_id = ?', $initiatorId);
         $result = $adapter->fetchOne($select);
-        $orderId = ($result !== false) ? $result : -1;
-        return $orderId;
+        return ($result !== false) ? $result : -1;
     }
 
     /**

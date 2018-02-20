@@ -5,7 +5,6 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_View extends Mage_Adminhtm
     public function __construct()
     {
         parent::__construct();
-
         $this->checkAndAddButton();
     }
 
