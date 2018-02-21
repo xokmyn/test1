@@ -12,7 +12,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     protected function checkAndAddButtons()
     {
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
         $_isCallcenter = $initiatorModel->isCallcenterUser();
         if ($_isCallcenter
             && $initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {

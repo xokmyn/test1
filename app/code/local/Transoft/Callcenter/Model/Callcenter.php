@@ -19,20 +19,6 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
     protected $_callcenterUser = null;
 
     /**
-     * Constructor
-     *
-     * @access public
-     * @return void
-     */
-    public function _construct()
-    {
-        parent::_construct();
-        if (!$this->_isCallcenter) {
-            $this->_initCallcenterUser();
-        }
-    }
-
-    /**
      * Check is allowed actions for callcenter
      *
      * @param string $action
@@ -60,6 +46,24 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
         }
 
         return $this;
+    }
+
+    /**
+     * Get callcenter user
+    */
+    public function callcenterUser()
+    {
+        $this->_initCallcenterUser();
+        return $this->_callcenterUser;
+    }
+
+    /**
+     * Check if user in callcenter roles
+    */
+    public function isCallcenter()
+    {
+        $this->_initCallcenterUser();
+        return $this->_isCallcenter;
     }
 
     /**
