@@ -57,7 +57,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         $initiator = $this->_initInitiator();
         if (!$initiator) {
             $this->_getSession()->addError(
-                Mage::helper('transoft_callcenter')->__('Ви не являетесь пользователем коллцентра.')
+                Mage::helper('transoft_callcenter')->__('You are not user of callcenter')
             );
             $this->_redirect('*/*/');
             return;
@@ -67,7 +67,7 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         */
         $initiator->addInitiatorToPosition();
         $this->_getSession()->addNotice(
-            Mage::helper('transoft_callcenter')->__('Вы добавлены в очередь на полечение заказа')
+            Mage::helper('transoft_callcenter')->__('You add to queue')
         );
         $this->_redirect('*/sales_order/');
     }
