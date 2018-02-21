@@ -23,7 +23,6 @@
                     <sales_order_grid>Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
                     <sales_order_view>Transoft_Callcenter_Block_Adminhtml_Sales_Order_View</sales_order_view>
                     <sales_order>Transoft_Callcenter_Block_Adminhtml_Sales_Order</sales_order>
-                    <permissions_user_edit_tab_main>Transoft_Callcenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main</permissions_user_edit_tab_main>
                 </rewrite>
             </adminhtml>
         </blocks>
@@ -67,6 +66,15 @@
                     </disabled_order_initiator>
                 </observers>
             </sales_order_save_after>
+            <adminhtml_block_html_before>
+                <observers>
+                    <add_callcenter_type>
+                        <type>model</type>
+                        <class>transoft_callcenter/adminhtml_observer</class>
+                        <method>addCallcenterTypeField</method>
+                    </add_callcenter_type>
+                </observers>
+            </adminhtml_block_html_before>
         </events>
         <translate>
             <modules>

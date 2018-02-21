@@ -148,16 +148,16 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     protected function _getOrderForInitiator($collection, $attributeSetId, $type)
     {
         foreach ($collection as $order) {
-            $order_id = $order->getId();
+            $orderId = $order->getId();
             if (!$type) {
-                return $order_id;
+                return $orderId;
             }
-            $order = Mage::getModel('sales/order')->load($order_id);
+            $order = Mage::getModel('sales/order')->load($orderId);
             foreach ($order->getAllItems() as $item) {
                 $product = $item->getProduct();
                 if ((int)$product->getAttributeSetId() === (int)$attributeSetId
                     && (int)$product->getData('callcenter_format_type') === (int)$type) {
-                    return $order_id;
+                    return $orderId;
                 }
             }
         }
@@ -182,16 +182,16 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     /**
      * Get attribute options value
      *
-     * @param string $option_code
+     * @param string $optionCode
      * @return int||null
      */
-    public function getTypeOptionValue($option_code)
+    public function getTypeOptionValue($optionCode)
     {
-        $attribute_options = Mage::getModel('transoft_callcenter/initiator_type')
+        $attributeOptions = Mage::getModel('transoft_callcenter/initiator_type')
             ->getAllOptions();
-        $attribute_options = Mage::helper('transoft_callcenter')->convertOptions($attribute_options);
+        $attributeOptions = Mage::helper('transoft_callcenter')->convertOptions($attributeOptions);
 
-        return array_flip($attribute_options)[$option_code];
+        return array_flip($attributeOptions)[$optionCode];
     }
 
     /**

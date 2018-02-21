@@ -52,8 +52,8 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
         if ($this->_isAllowedAction('actions')) {
             $user = Mage::getSingleton('admin/session')->getUser();
             $role = $user->getRole();
-            $callcenter_role_source = Mage::getModel('transoft_callcenter/initiator_source');
-            $this->_isCallcenter = (in_array($role->getRoleId(), $callcenter_role_source->getCallcenterRoleIds()));
+            $callcenterRoleSource = Mage::getModel('transoft_callcenter/initiator_source');
+            $this->_isCallcenter = (in_array($role->getRoleId(), $callcenterRoleSource->getCallcenterRoleIds()));
             $callcenterRoleName = $this->_isCallcenter ? $role->getRoleName() : null;
             $user->setData('callcenter_role', $callcenterRoleName);
             $this->_callcenterUser = $user;
@@ -97,7 +97,6 @@ abstract class Transoft_Callcenter_Model_Callcenter extends Mage_Core_Model_Abst
         $data[$initiatorId] = array(
             'status' => $status,
         );
-
         Mage::getResourceSingleton('transoft_callcenter/initiator_order')
             ->saveOrderRelation($orderId, $data);
 
