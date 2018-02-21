@@ -7,8 +7,8 @@ $this->startSetup();
 /**
  * Create relations table initiator-order
  */
-$order_table = Mage::getModel('sales/order')->getResource()->getTable('order');
-$admin_user = Mage::getModel('admin/user')->getResource()->getTable('user');
+$orderTable = Mage::getModel('sales/order')->getResource()->getTable('order');
+$adminUser = Mage::getModel('admin/user')->getResource()->getTable('user');
 $table = $this->getConnection()
     ->newTable($this->getTable('transoft_callcenter/initiator_order'))
     ->addColumn(
@@ -59,11 +59,11 @@ $table = $this->getConnection()
         $this->getFkName(
             'transoft_callcenter/initiator_order',
             'initiator_id',
-            $admin_user,
+            $adminUser,
             'user_id'
         ),
         'initiator_id',
-        $admin_user,
+        $adminUser,
         'user_id',
         Varien_Db_Ddl_Table::ACTION_CASCADE,
         Varien_Db_Ddl_Table::ACTION_CASCADE

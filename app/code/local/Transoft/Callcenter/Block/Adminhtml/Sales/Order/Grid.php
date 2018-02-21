@@ -15,14 +15,15 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
     protected function _prepareCollection()
     {
         if ($this->_isCallcenter) {
-            $model      = Mage::getModel('transoft_callcenter/initiator');
-            $user_id    = $model->getCallcenterUserId();
+            /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $user_id    = $initiatorModel->getCallcenterUserId();
             $collection = Mage::getResourceModel($this->_getCollectionClass());
             $cond       = null;
             //we changed mysql query, we added inner join to order item table
-            if ($model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
+            if ($initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
                 $cond = 'related.order_id = main_table.entity_id AND related.initiator_id = ' . $user_id;
-            } elseif ($model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::COORDINATOR) {
+            } elseif ($initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::COORDINATOR) {
                 $cond = 'related.order_id = main_table.entity_id';
             }
             $collection->join(

@@ -11,20 +11,22 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
 
     protected function checkAndAddButtons()
     {
-        $model       = Mage::getModel('transoft_callcenter/initiator');
-        if ($model->isCallcenterUser()
-            && $model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
+        /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        $_isCallcenter = $initiatorModel->isCallcenterUser();
+        if ($_isCallcenter
+            && $initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
             $buttonData = $this->getButtonData();
             $enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
-                ->initiatorStatusFilter($model->getCallcenterUserId(), true);
+                ->initiatorStatusFilter($initiatorModel->getCallcenterUserId(), true);
             if ($enabledOrderId === 0) {
-                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('В ожидание заказа');
+                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Wait order');
                 $buttonData['class'] = 'disabled';
                 unset($buttonData['onclick']);
             } elseif ($enabledOrderId > 0) {
                 $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabledOrderId]);
                 $buttonData['onclick'] = 'setLocation(\'' . $url . '\')';
-                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Получить необработанний заказ');
+                $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Get pending order');
             }
             $this->addButton(
                 'callcenter_initiator_get_order',
@@ -54,7 +56,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     public function getButtonData()
     {
         return [
-            'label'   =>  Mage::helper('transoft_callcenter')->__('Получить заказ'),
+            'label'   =>  Mage::helper('transoft_callcenter')->__('Get Order'),
             'onclick' => 'setLocation(\'' . $this->getOrderUrlForInitiator() . '\')',
             'class'   => 'add',
         ];

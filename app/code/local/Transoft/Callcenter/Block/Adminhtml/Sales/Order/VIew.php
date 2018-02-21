@@ -13,13 +13,14 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_View extends Mage_Adminhtm
     */
     protected function checkAndAddButton()
     {
-        $model = Mage::getModel('transoft_callcenter/initiator');
-        if ($model->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::COORDINATOR) {
+        /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        if ($initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::COORDINATOR) {
             $url = $this->getUrl(
                 '*/callcenter_initiator/removeInitiator/',
                 ['order_id' => Mage::registry('current_order')->getId()]
             );
-            $this->_addButton('button_id', array(
+            $this->addButton('button_id', array(
                 'label'     => Mage::helper('transoft_callcenter')->__('Remove Initiator'),
                 'onclick'   => 'setLocation(\'' . $url . '\')',
                 'class'     => 'delete'
