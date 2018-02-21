@@ -16,11 +16,11 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function addInitiatorId($observer)
     {
-        if ($this->_isCallcenter) {
+        if ($this->isCallcenter()) {
             $order = $observer->getOrder();
             $orderId = $order->getId();
             /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
             $userId = $initiatorModel->getCallcenterUserId();
             /**
              * if order was reorder
@@ -46,14 +46,14 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function afterSaveOrder($observer)
     {
-        if ($this->_isCallcenter) {
+        if ($this->isCallcenter()) {
             $order = $observer->getOrder();
             $orderId = $order->getId();
             if ($orderId && $order->getStatus() !== 'pending') {
                 $this->saveOrderInitiator($orderId, false);
             } elseif ($order->getData('callcenter_user')) {
                 /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-                $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+                $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
                 $userId = $initiatorModel->getCallcenterUserId();
                 $data[$orderId] = ['status' => true, 'position' => 1];
                 Mage::getResourceSingleton('transoft_callcenter/initiator_order')
@@ -69,7 +69,7 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function cronAssignmentOrderId($schedule)
     {
-        Mage::getModel('transoft_callcenter/initiator')->saveOrderWithProductSetToInitiator();
+        Mage::getSingleton('transoft_callcenter/initiator')->saveOrderWithProductSetToInitiator();
     }
 
     /**
