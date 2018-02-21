@@ -29,24 +29,24 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
      * init the initiator
      *
      * @access protected
-     * @return false||Transoft_Callcenter_Model_Initiator
+     * @return Transoft_Callcenter_Model_Initiator|false
      */
     protected function _initInitiator()
     {
-        $initiator = $this->_checkCallcenterUser() ? Mage::getModel('transoft_callcenter/initiator') : false;
-        return $initiator;
+        return $this->_checkCallcenterUser();
     }
 
     /**
      * Check is user in callcenter role
      *
-     * @return bool
+     * @return Transoft_Callcenter_Model_Initiator|bool
      */
     protected function _checkCallcenterUser()
     {
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
-        return $initiatorModel->isCallcenterUser();
+        $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
+
+        return $initiatorModel->isCallcenterUser() ? $initiatorModel : false;
     }
 
     /**
@@ -95,7 +95,6 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     /**
      * mass delete initiator
      *
-     * @access public
      * @return void
      */
     public function massRemoveInitiatorAction()

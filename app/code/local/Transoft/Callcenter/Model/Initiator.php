@@ -9,22 +9,11 @@
 class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Callcenter
 {
     /**
-     * constructor
-     *
-     * @access public
-     * @return void
-     */
-    public function _construct()
-    {
-        parent::_construct();
-    }
-
-    /**
      * Check is user used Callcenter
      */
     public function isCallcenterUser()
     {
-        return $this->_isCallcenter;
+        return $this->isCallcenter();
     }
 
     /**
@@ -32,7 +21,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function getCallcenterUserRoleName()
     {
-        return $this->_callcenterUser->getData('callcenter_role');
+        return $this->callcenterUser()->getData('callcenter_role');
     }
 
     /**
@@ -40,7 +29,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function getCallcenterUserId()
     {
-        return $this->_callcenterUser->getUserId();
+        return $this->callcenterUser()->getUserId();
     }
 
     /**
@@ -58,7 +47,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     {
         $orderIds = array_unique(
             Mage::getResourceSingleton('transoft_callcenter/initiator_order')
-                ->getAllOrderIdsStatusEnabled(true)
+                ->getAllOrderIdsStatusEnabled()
         );
         return $orderIds;
     }
@@ -195,7 +184,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
     }
 
     /**
-     * Set initiator_id for order to NULL
+     * Remove pairs initiator-order from table
      *
      * @param int||array $orderId
      * @return void

@@ -8,7 +8,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
     {
         parent::__construct();
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-        $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+        $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
         $this->_isCallcenter = $initiatorModel->isCallcenterUser();
     }
 
@@ -16,7 +16,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
     {
         if ($this->_isCallcenter) {
             /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
-            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
             $user_id    = $initiatorModel->getCallcenterUserId();
             $collection = Mage::getResourceModel($this->_getCollectionClass());
             $cond       = null;
