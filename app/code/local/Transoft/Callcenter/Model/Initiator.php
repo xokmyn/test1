@@ -9,7 +9,21 @@
 class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Callcenter
 {
     /**
-     * Check is user used Callcenter
+     * @var array
+     */
+    private $processUserOrder = [];
+
+    /**
+     * @return array
+     */
+    public function getProcessUserOrder()
+    {
+        return $this->processUserOrder;
+    }
+
+    /**
+     * Check is user used Ca
+     * llcenter
      */
     public function isCallcenterUser()
     {
@@ -54,16 +68,18 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
 
     /**
      * Get order collection for using in callcenter
+     *
+     * @return Mage_Sales_Model_Resource_Order_Collection
      */
     public function getNewOrderCollection()
     {
+        /** @var Mage_Sales_Model_Resource_Order_Collection $orders */
         $orders = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('state', Mage_Sales_Model_Order::STATE_NEW);
         $excludeIds = $this->getExcludeOrderIds();
         if ($excludeIds) {
             $orders->getSelect()->where('main_table.entity_id NOT IN(?)', $excludeIds);
         }
-
         return $orders;
     }
 
@@ -102,6 +118,7 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
      */
     public function saveOrderWithProductSetToInitiator()
     {
+        $processData  = [];
         $users = $this->getUserWithTypeInQueue();
         if ($users) {
             $collection = $this->getNewOrderCollection();
@@ -119,10 +136,12 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
                 if ($orderId) {
                     $data[$orderId] = ['status' => true, 'position' => 1];
                     $this->saveInitiatorOrderRelation($user['initiator_id'], $data);
+                    $processData[$orderId] = $user['initiator_id'];
                 }
                 $collection->removeItemByKey($orderId);
             }
         }
+        $this->processUserOrder = $processData;
     }
 
     /**

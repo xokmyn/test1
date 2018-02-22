@@ -2,19 +2,55 @@
 
 class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 {
+    public $app = null;
+    /**
+     * @var Transoft_Callcenter_Model_Initiator
+     */
+    public $initiatorModel;
+
     public function setUp()
     {
-        /* You'll have to load Magento app in any test classes in this method */
-        $app = Mage::app('default');
+        $this->app = Mage::app('default');
+        $this->initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
     }
 
-    public function testFirstMethod()
+    public function tearDown()
     {
-        /*Here goes the assertions for your block first method*/
+        unset($this->app);
     }
 
-    public function testSecondMethod()
+    /**
+     * Check work saving order id to relation table initiator-order
+    */
+    public function testSaveOrderWithProductSetToInitiator()
     {
-        /*Here goes the assertions for your block second method*/
+        $saveResult = $this->initiatorModel->saveOrderWithProductSetToInitiator();
+        $this->assertNull($saveResult);
+    }
+
+    /**
+     * Get orders collection with status "NEW" and exclude order Ids
+    */
+    public function testGetNewOrderCollection()
+    {
+        $orderCollection = $this->initiatorModel->getNewOrderCollection();
+        $this->assertInstanceOf(Mage_Sales_Model_Resource_Order_Collection::class, $orderCollection);
+    }
+
+    /**
+     * Check if order with status "new" are in table transoft_callcenter_initiator_order
+    */
+    public function testIsOrderIdsInInitiatorId()
+    {
+        $arrData = $this->initiatorModel->getProcessUserOrder();
+        /** @var Transoft_Callcenter_Model_Resource_Initiator_Order $model */
+        $model = Mage::getResourceModel('transoft_callcenter/initiator_order');
+        foreach ($arrData as $k => $data) {
+            $dataTable = $model->getOrderInitiatorRelation($k, $data);
+            if ($dataTable) {
+                unset($arrData[$k]);
+            }
+        }
+        $this->assertEmpty($arrData);
     }
 }
