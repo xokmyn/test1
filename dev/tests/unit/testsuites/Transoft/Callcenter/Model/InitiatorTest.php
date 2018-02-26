@@ -11,7 +11,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
     private $websiteId;
     private $customer;
     private $customerEmail = 'jdsdf1@ex.com';
-    public static $orderIds = [];
+    private $orders = [];
     private $callcenterUsers = [];
 
     /**
@@ -21,7 +21,6 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
     {
         return $this->callcenterUsers;
     }
-
 
 
     /**
@@ -231,7 +230,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         $customer->setWebsiteId($websiteId);
         $customer->loadByEmail($email);
         if (!$customer->getId()) {
-            $customer   ->setWebsiteId($websiteId)
+            $customer->setWebsiteId($websiteId)
                 ->setStore($store)
                 ->setFirstname('Callcenter')
                 ->setLastname('Test')
@@ -364,6 +363,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 
             $subTotal += $rowTotal;
             $order->addItem($orderItem);
+            $order->setData('callcenter_format_type', $product->getData('callcenter_format_type'));
         }
 
         $order->setSubtotal($subTotal)
@@ -379,7 +379,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         } catch (Exception $e) {
             Mage::log('Order save error...');
         }
-        self::$orderIds[] = $reservedOrderId;
+        $this->orders[] = $order;
     }
 
     /**
@@ -400,17 +400,65 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         $this->initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
         $callcenterUsers = $this->getCallcenterUsers();
         foreach ($callcenterUsers as $callcenterUser) {
-            $this->initiatorModel->addInitiatorToPosition($callcenterUser->getId());
+            /** @var Transoft_Callcenter_Model_Initiator_Source $sourceModel */
+            $sourceModel = Mage::getModel('transoft_callcenter/initiator_source');
+            /** @var Mage_Admin_Model_Role $roleModel */
+            $roleModel =  $callcenterUser->getRole();
+            $roleName  = $roleModel->getRoleName();
+            if($roleName === $sourceModel::OPERATOR) {
+                $this->initiatorModel->addInitiatorToPosition($callcenterUser->getId());
+            }
         }
-        $this->initiatorModel->saveOrderWithProductSetToInitiator();
-        $userOrder = $this->initiatorModel->getProcessUserOrder();
-        //todo assert
-        foreach ($userOrder as $orderId => $initiatorId) {
-            echo 'Callcenter User '.$initiatorId.' created get Order ID '.$orderId.PHP_EOL;
+        $rightData = $this->getRightOrderInitiator();
+        $orderIds  = array_keys($rightData);
+        $this->initiatorModel->saveOrderWithProductSetToInitiator($orderIds);
+        $arrUserOrder = $this->initiatorModel->getProcessUserOrder();
+        //comparison two arrays
+        $this->assertEquals($arrUserOrder, $this->getRightOrderInitiator());
+        foreach ($arrUserOrder as $orderId => $initiatorId) {
+            echo 'Callcenter User ' . $initiatorId . ' created get Order ID ' . $orderId . PHP_EOL;
         }
         $this->removeAllData();
     }
 
+    /**
+     * Get right value for order initiator array
+     * @return array as ['order_id' => 'initiator_id']
+     */
+    public function getRightOrderInitiator()
+    {
+        $data     = [];
+        $userData = [];
+        $orders = $this->orders;
+        $users = $this->callcenterUsers;
+        foreach ($users as $user) {
+            /** @var Transoft_Callcenter_Model_Initiator_Source $sourceModel */
+            $sourceModel = Mage::getModel('transoft_callcenter/initiator_source');
+            /** @var Mage_Admin_Model_Role $roleModel */
+            $roleModel =  $user->getRole();
+            $roleName  = $roleModel->getRoleName();
+            if($roleName === $sourceModel::OPERATOR) {
+                $userType = $user->getData('callcenter_type') ?: 0;
+                $userData[$userType] = $user->getUserId();
+            }
+        }
+        foreach ($orders as $order) {
+            $id = $order->getIncrementId();
+            $orderType = $order->getData('callcenter_format_type') ?: 0;
+            /** @var Mage_Sales_Model_Order $orderModel */
+            $orderModel = Mage::getModel('sales/order')->loadByIncrementId($id);
+            $orderId = $orderModel->getEntityId();
+            if ($userData[$orderType]) {
+                $data[$orderId] = $userData[$orderType];
+            }
+            unset($userData[$orderType]);
+        }
+        return $data;
+    }
+
+    /**
+     * Created callcenter admin users
+     */
     public function createCallcenterUser()
     {
         /** @var Transoft_Callcenter_Model_Initiator_Source $sourceModel */
@@ -440,16 +488,19 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @param array $data callcenter admin user
+     */
     public function saveCallcenterAdminUser($data)
     {
         try {
             $user = Mage::getModel('admin/user')
                 ->setData(array(
-                    'username'  => 'Operator '.$data['label'],
-                    'firstname' => 'OperatorFirst '.$data['label'],
-                    'lastname'  => 'OperatorLast '.$data['label'],
-                    'email'     => $data['email'],
-                    'password'  => '3lP4ass3or$',
+                    'username' => 'Operator ' . $data['label'],
+                    'firstname' => 'OperatorFirst ' . $data['label'],
+                    'lastname' => 'OperatorLast ' . $data['label'],
+                    'email' => $data['email'],
+                    'password' => '3lP4ass3or$',
                     'is_active' => 1,
                     'callcenter_type' => $data['type_id']
                 ))->save();
@@ -460,14 +511,13 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         //Assign Role Id
         try {
             $user->setRoleIds(array($data['role_id']))
-                ->setRoleUserId($user->getUserId())
                 ->saveRelations();
         } catch (Exception $e) {
             echo $e->getMessage();
             exit;
         }
         $this->callcenterUsers[] = $user;
-        echo 'Callcenter User '.$data['label'].'created successfully'.PHP_EOL;
+        echo 'Callcenter User ' . $data['label'] . ' created successfully' . PHP_EOL;
     }
 
     /**
@@ -475,14 +525,15 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
      */
     public function removeAllData()
     {
-        foreach (self::$orderIds as $id) {
+        foreach ($this->orders as $order) {
+            $id = $order->getIncrementId();
             try {
                 /** @var Mage_Sales_Model_Order $orderModel */
                 $orderModel = Mage::getModel('sales/order')->loadByIncrementId($id);
                 $orderModel->delete();
-                echo 'order #'.$id.' is removed'.PHP_EOL;
+                echo 'Order # ' . $id . ' is removed' . PHP_EOL;
             } catch (Exception $e) {
-                echo 'order #'.$id.' could not be removed: '.$e->getMessage().PHP_EOL;
+                echo 'Order # ' . $id . ' could not be removed: ' . $e->getMessage() . PHP_EOL;
             }
         }
         $websiteId = $this->app->getWebsite()->getId();
@@ -493,18 +544,18 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         $customer->loadByEmail($email);
         try {
             $customer->delete();
-            echo 'Customer with email : '.$email.' is removed'.PHP_EOL;
+            echo 'Customer with email : ' . $email . ' is removed' . PHP_EOL;
         } catch (Exception $e) {
-            echo 'Customer with email : '.$email.' could not be removed: '.$e->getMessage().PHP_EOL;
+            echo 'Customer with email : ' . $email . ' could not be removed: ' . $e->getMessage() . PHP_EOL;
         }
         $products = $this->getProducts();
         foreach ($products as $product) {
             $productId = $product->getId();
             try {
                 $product->delete();
-                echo 'Product #'.$productId.' is removed'.PHP_EOL;
+                echo 'Product # ' . $productId . ' is removed' . PHP_EOL;
             } catch (Exception $e) {
-                echo 'Product #'.$productId.' could not be removed: '.$e->getMessage().PHP_EOL;
+                echo 'Product # ' . $productId . ' could not be removed: ' . $e->getMessage() . PHP_EOL;
             }
         }
         $callcenterUsers = $this->getCallcenterUsers();
@@ -512,25 +563,10 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
             try {
                 $email = $user->getEmail();
                 $user->delete();
-                echo 'User with email : '.$email.' is removed'.PHP_EOL;
+                echo 'User with email : ' . $email . ' is removed' . PHP_EOL;
             } catch (Exception $e) {
-                echo 'User with email : '.$email.' could not be removed: '.$e->getMessage().PHP_EOL;
+                echo 'User with email : ' . $email . ' could not be removed: ' . $e->getMessage() . PHP_EOL;
             }
         }
-        /*$setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
-        try {
-            $setup->removeAttribute('catalog_product', 'callcenter_format_type');
-            echo '"callcenter_format_type" attribute is removed'.PHP_EOL;
-        } catch (Exception $e) {
-            echo '"callcenter_format_type" could not be removed: '.$e->getMessage().PHP_EOL;
-        }
-        $attributeSetId = $this->getProductAttributeSetId();
-        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
-        try {
-            $attributeSet->delete();
-            echo 'Attribute Set ID #'.$attributeSetId.' is removed'.PHP_EOL;
-        } catch (Exception $e) {
-            echo 'Attribute Set ID #'.$attributeSetId.' could not be removed: '.$e->getMessage().PHP_EOL;
-        }*/
     }
 }
