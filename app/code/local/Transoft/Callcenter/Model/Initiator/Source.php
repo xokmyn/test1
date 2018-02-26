@@ -116,6 +116,7 @@ class Transoft_Callcenter_Model_Initiator_Source extends Mage_Eav_Model_Entity_A
 
     /**
      * Get role ids for Callcenter
+     * @return array
      */
     public function getCallcenterRoleIds()
     {
@@ -125,6 +126,22 @@ class Transoft_Callcenter_Model_Initiator_Source extends Mage_Eav_Model_Entity_A
             [self::OPERATOR, self::COORDINATOR]
         )
             ->getColumnValues('role_id');
+
+        return $roleIds;
+    }
+
+    /**
+     * Get roles for Callcenter
+     * @return array
+     */
+    public function getCallcenterRoles()
+    {
+        $adminRoles = Mage::getModel('admin/roles')->getCollection();
+        $roleIds = $adminRoles->addFieldToFilter(
+            'role_name',
+            [self::OPERATOR, self::COORDINATOR]
+        )
+            ->getItems();
 
         return $roleIds;
     }
