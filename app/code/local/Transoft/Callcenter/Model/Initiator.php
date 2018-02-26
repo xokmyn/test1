@@ -48,10 +48,11 @@ class Transoft_Callcenter_Model_Initiator extends Transoft_Callcenter_Model_Call
 
     /**
      * Save initiator to relation table "transoft_callcenter_initiator_order" with position value
+     * @param int
      */
-    public function addInitiatorToPosition()
+    public function addInitiatorToPosition($initiatorId = 0)
     {
-        $this->saveInitiatorPosition();
+        $this->saveInitiatorPosition($initiatorId);
     }
 
     /**
