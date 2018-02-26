@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Transoft_Callcenter>
-            <version>1.0.2</version>
+            <version>1.0.1</version>
         </Transoft_Callcenter>
     </modules>
     <global>
@@ -39,9 +39,9 @@
             <transoft_callcenter_resource>
                 <class>Transoft_Callcenter_Model_Resource</class>
                 <entities>
-                    <initiator_order>
-                        <table>transoft_callcenter_initiator_order</table>
-                    </initiator_order>
+                    <initiator>
+                        <table>transoft_callcenter_initiator</table>
+                    </initiator>
                 </entities>
             </transoft_callcenter_resource>
         </models>

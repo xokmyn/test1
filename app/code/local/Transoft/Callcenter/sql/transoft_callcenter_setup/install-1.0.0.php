@@ -9,55 +9,72 @@ $this->startSetup();
  */
 $orderTable = Mage::getModel('sales/order')->getResource()->getTable('order');
 $adminUser = Mage::getModel('admin/user')->getResource()->getTable('user');
+
 $table = $this->getConnection()
-    ->newTable($this->getTable('transoft_callcenter/initiator_order'))
+    ->newTable($this->getTable('transoft_callcenter/initiator'))
     ->addColumn(
-        'rel_id',
+        'entity_id',
         Varien_Db_Ddl_Table::TYPE_INTEGER,
         null,
         array(
-            'unsigned' => true,
             'identity' => true,
             'nullable' => false,
             'primary' => true,
         ),
-        'Relation ID'
+        'Initiator Order ID'
     )
     ->addColumn(
         'initiator_id',
-        Varien_Db_Ddl_Table::TYPE_INTEGER,
-        null,
+        Varien_Db_Ddl_Table::TYPE_INTEGER, null,
         array(
-            'unsigned' => true,
             'nullable' => false,
-            'default' => '0',
+            'unsigned' => true,
         ),
         'Initiator ID'
     )
     ->addColumn(
         'order_id',
-        Varien_Db_Ddl_Table::TYPE_INTEGER,
-        null,
+        Varien_Db_Ddl_Table::TYPE_INTEGER, null,
+        array(
+            'nullable' => false,
+            'default' => 0
+        ),
+        'Order Id'
+    )
+    ->addColumn(
+        'position',
+        Varien_Db_Ddl_Table::TYPE_INTEGER, null,
         array(
             'unsigned' => true,
-            'nullable' => false,
-            'default' => '0',
+            'default' => 1
         ),
-        'Order ID'
+        'Position'
     )
     ->addColumn(
         'status',
-        Varien_Db_Ddl_Table::TYPE_SMALLINT,
-        null,
+        Varien_Db_Ddl_Table::TYPE_SMALLINT, null,
         array(
-            'nullable' => false,
-            'default' => '1',
+            'default' => 1
         ),
-        'Status'
+        'Enabled'
+    )
+    ->addColumn(
+        'updated_at',
+        Varien_Db_Ddl_Table::TYPE_TIMESTAMP,
+        null,
+        array(),
+        'Initiator Order Modification Time'
+    )
+    ->addColumn(
+        'created_at',
+        Varien_Db_Ddl_Table::TYPE_TIMESTAMP,
+        null,
+        array(),
+        'Initiator Order Creation Time'
     )
     ->addForeignKey(
         $this->getFkName(
-            'transoft_callcenter/initiator_order',
+            'transoft_callcenter/initiator',
             'initiator_id',
             $adminUser,
             'user_id'
@@ -70,7 +87,7 @@ $table = $this->getConnection()
     )
     ->addIndex(
         $this->getIdxName(
-            'transoft_callcenter/initiator_order',
+            'transoft_callcenter/initiator',
             array('initiator_id', 'order_id'),
             Varien_Db_Adapter_Interface::INDEX_TYPE_UNIQUE
         ),
@@ -79,5 +96,4 @@ $table = $this->getConnection()
     )
     ->setComment('Initiator to Order Linkage Table');
 $this->getConnection()->createTable($table);
-
 $this->endSetup();
