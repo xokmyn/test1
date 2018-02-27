@@ -31,9 +31,9 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
      * @access protected
      * @return Transoft_Callcenter_Model_Initiator|false
      */
-    protected function _initInitiator()
+    protected function initInitiator()
     {
-        return $this->_checkCallcenterUser();
+        return $this->checkCallcenterUser();
     }
 
     /**
@@ -41,12 +41,12 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
      *
      * @return Transoft_Callcenter_Model_Initiator|bool
      */
-    protected function _checkCallcenterUser()
+    protected function checkCallcenterUser()
     {
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
         $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
 
-        return $initiatorModel->isCallcenterUser() ? $initiatorModel : false;
+        return $initiatorModel->checkIsCallcenter() ? $initiatorModel : false;
     }
 
     /**
@@ -78,15 +78,18 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
     public function removeInitiatorAction()
     {
         if ($orderId = (int)$this->getRequest()->getParam('order_id')) {
+            /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $model = $initiatorModel->getCollection()->addFieldToFilter('order_id', $orderId)->getFirstItem();
             try {
-                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderId);
-                $this->_getSession()->addSuccess(
-                    Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
-                );
+                $model->delete();
             } catch (Exception $e) {
                 $this->_getSession()->addError($e->getMessage());
             }
         }
+        $this->_getSession()->addSuccess(
+            Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
+        );
         $this->getResponse()->setRedirect(
             $this->getUrl('*/sales_order/', array('store' => $this->getRequest()->getParam('store')))
         );
@@ -103,15 +106,22 @@ class Transoft_Callcenter_Adminhtml_Callcenter_InitiatorController extends Mage_
         if (!is_array($orderIds)) {
             $this->_getSession()->addError($this->__('Please select initiators.'));
         } else {
-            try {
-                Mage::getModel('transoft_callcenter/initiator')->removeInitiator($orderIds);
-                $this->_getSession()->addSuccess(
-                    Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
-                );
-            } catch (Exception $e) {
-                $this->_getSession()->addError($e->getMessage());
+            /** @var Transoft_Callcenter_Model_Resource_Initiator_Collection $resourceCollection */
+            $resourceCollection = Mage::getResourceSingleton('transoft_callcenter/initiator_collection');
+            $items = $resourceCollection->addFieldToSelect('entity_id')
+                ->addFieldToFilter('order_id', array('in' => $orderIds))
+                ->getItems();
+            foreach ($items as $item) {
+                try {
+                    $item->delete();
+                } catch (Exception $e) {
+                    $this->_getSession()->addError($e->getMessage());
+                }
             }
         }
+        $this->_getSession()->addSuccess(
+            Mage::helper('transoft_callcenter')->__('The initiator has been deleted.')
+        );
         $this->_redirect('*/sales_order/');
     }
 }

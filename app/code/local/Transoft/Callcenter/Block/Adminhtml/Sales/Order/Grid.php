@@ -2,19 +2,19 @@
 
 class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtml_Block_Sales_Order_Grid
 {
-    protected $_isCallcenter;
+    protected $isCallcenter;
 
     public function __construct()
     {
         parent::__construct();
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
         $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
-        $this->_isCallcenter = $initiatorModel->isCallcenterUser();
+        $this->isCallcenter = $initiatorModel->checkIsCallcenter();
     }
 
     protected function _prepareCollection()
     {
-        if ($this->_isCallcenter) {
+        if ($this->isCallcenter) {
             /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
             $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
             $user_id    = $initiatorModel->getCallcenterUserId();
@@ -27,7 +27,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
                 $cond = 'related.order_id = main_table.entity_id';
             }
             $collection->join(
-                array('related' => 'transoft_callcenter/initiator_order'),
+                array('related' => $initiatorModel->getResourceName()),
                 $cond,
                 array('initiator_id' => 'initiator_id')
             );
@@ -40,7 +40,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
 
     protected function _prepareColumns()
     {
-        if ($this->_isCallcenter) {
+        if ($this->isCallcenter) {
             $this->addColumn('initiator_id', array(
                 'header'=> Mage::helper('transoft_callcenter')->__('Initiator ID'),
                 'width' => '80px',
@@ -56,7 +56,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtm
     */
     protected function _prepareMassaction()
     {
-        if ($this->_isCallcenter) {
+        if ($this->isCallcenter) {
             $this->setMassactionIdField('entity_id');
             $this->getMassactionBlock()->setFormFieldName('order_ids');
             $this->getMassactionBlock()->setUseSelectAll(false);
