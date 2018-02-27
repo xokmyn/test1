@@ -2,7 +2,7 @@
 
 class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 {
-    public $app;
+    public  $app;
     private $productAttributeSetId;
     private $optionsProduct;
     private $products;
@@ -35,6 +35,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        $this->removeAllData();
         unset($this->app);
     }
 
@@ -383,9 +384,9 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Check work saving order id to relation table initiator-order
+     * Prepare data for test
      */
-    public function testSaveOrderWithProductSetToInitiator()
+    public function prepareDataForTest()
     {
         $this->createCallcenterUser();
         $this->createCustomer();
@@ -396,21 +397,31 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
             $_products = $this->getProductsForOrder($product);
             $this->createOrder($_products);
         }
-        /** @var Transoft_Callcenter_Model_Initiator initiatorModel */
-        $this->initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
         $callcenterUsers = $this->getCallcenterUsers();
         foreach ($callcenterUsers as $callcenterUser) {
+            /** @var Transoft_Callcenter_Model_Initiator initiatorModel */
+            $model = Mage::getModel('transoft_callcenter/initiator');
             /** @var Transoft_Callcenter_Model_Initiator_Source $sourceModel */
             $sourceModel = Mage::getModel('transoft_callcenter/initiator_source');
             /** @var Mage_Admin_Model_Role $roleModel */
-            $roleModel =  $callcenterUser->getRole();
-            $roleName  = $roleModel->getRoleName();
-            if($roleName === $sourceModel::OPERATOR) {
-                $this->initiatorModel->addInitiatorToPosition($callcenterUser->getId());
+            $roleModel = $callcenterUser->getRole();
+            $roleName = $roleModel->getRoleName();
+            if ($roleName === $sourceModel::OPERATOR) {
+                $model->addInitiatorToPosition($callcenterUser->getUserId());
             }
         }
+    }
+
+    /**
+     * Check work saving order id to relation table initiator-order
+     */
+    public function testSaveOrderWithProductSetToInitiator()
+    {
+        $this->prepareDataForTest();
         $rightData = $this->getRightOrderInitiator();
-        $orderIds  = array_keys($rightData);
+        $orderIds = array_keys($rightData);
+        /** @var Transoft_Callcenter_Model_Initiator initiatorModel */
+        $this->initiatorModel = Mage::getModel('transoft_callcenter/initiator');
         $this->initiatorModel->saveOrderWithProductSetToInitiator($orderIds);
         $arrUserOrder = $this->initiatorModel->getProcessUserOrder();
         //comparison two arrays
@@ -418,7 +429,6 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         foreach ($arrUserOrder as $orderId => $initiatorId) {
             echo 'Callcenter User ' . $initiatorId . ' created get Order ID ' . $orderId . PHP_EOL;
         }
-        $this->removeAllData();
     }
 
     /**
@@ -427,7 +437,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
      */
     public function getRightOrderInitiator()
     {
-        $data     = [];
+        $data = [];
         $userData = [];
         $orders = $this->orders;
         $users = $this->callcenterUsers;
@@ -435,9 +445,9 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
             /** @var Transoft_Callcenter_Model_Initiator_Source $sourceModel */
             $sourceModel = Mage::getModel('transoft_callcenter/initiator_source');
             /** @var Mage_Admin_Model_Role $roleModel */
-            $roleModel =  $user->getRole();
-            $roleName  = $roleModel->getRoleName();
-            if($roleName === $sourceModel::OPERATOR) {
+            $roleModel = $user->getRole();
+            $roleName = $roleModel->getRoleName();
+            if ($roleName === $sourceModel::OPERATOR) {
                 $userType = $user->getData('callcenter_type') ?: 0;
                 $userData[$userType] = $user->getUserId();
             }
@@ -527,10 +537,14 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
     {
         foreach ($this->orders as $order) {
             $id = $order->getIncrementId();
+            /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
+            $initiatorModel = Mage::getModel('transoft_callcenter/initiator');
+            $model = $initiatorModel->getCollection()->addFieldToFilter('order_id', $id)->getFirstItem();
             try {
                 /** @var Mage_Sales_Model_Order $orderModel */
                 $orderModel = Mage::getModel('sales/order')->loadByIncrementId($id);
                 $orderModel->delete();
+                $model->delete();
                 echo 'Order # ' . $id . ' is removed' . PHP_EOL;
             } catch (Exception $e) {
                 echo 'Order # ' . $id . ' could not be removed: ' . $e->getMessage() . PHP_EOL;

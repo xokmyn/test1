@@ -13,13 +13,18 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     {
         /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
         $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
-        $_isCallcenter = $initiatorModel->isCallcenterUser();
-        if ($_isCallcenter
+        $isCallcenter = $initiatorModel->checkIsCallcenter();
+        if ($isCallcenter
             && $initiatorModel->getCallcenterUserRoleName() === Transoft_Callcenter_Model_Initiator_Source::OPERATOR) {
             $buttonData = $this->getButtonData();
-            $enabledOrderId = (int)Mage::getResourceModel('transoft_callcenter/initiator_order')
-                ->initiatorStatusFilter($initiatorModel->getCallcenterUserId(), true);
-            if ($enabledOrderId === 0) {
+            /** @var Transoft_Callcenter_Model_Resource_Initiator_Collection $collection */
+            $collection = $initiatorModel->getCollection();
+            $enabledOrderId = $collection->addFieldToSelect('order_id')
+            ->addFieldToFilter('initiator_id', $initiatorModel->getCallcenterUserId())
+            ->addFieldToFilter('status', 1)
+            ->getFirstItem()
+            ->getData('order_id');
+            if ($enabledOrderId === '0') {
                 $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Wait order');
                 $buttonData['class'] = 'disabled';
                 unset($buttonData['onclick']);

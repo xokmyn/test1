@@ -6,7 +6,7 @@
  * @category    Transoft
  * @package     Transoft_Callcenter
  */
-class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_Model_Callcenter
+class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_Model_Initiator
 {
 
     /**
@@ -16,7 +16,7 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function addInitiatorId($observer)
     {
-        if ($this->isCallcenter()) {
+        if ($this->checkIsCallcenter()) {
             $order = $observer->getOrder();
             $orderId = $order->getId();
             /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
@@ -26,7 +26,6 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
              * if order was reorder
              */
             if (!$orderId) {
-                $this->saveOrderInitiator(0, true, $userId);
                 $order->setData('callcenter_user', $userId);
             }
             if ($orderId && !$this->checkIsOrderInInitiator($order)) {
@@ -46,18 +45,26 @@ class Transoft_Callcenter_Model_Adminhtml_Observer extends Transoft_Callcenter_M
      */
     public function afterSaveOrder($observer)
     {
-        if ($this->isCallcenter()) {
+        if ($this->checkIsCallcenter()) {
             $order = $observer->getOrder();
             $orderId = $order->getId();
-            if ($orderId && $order->getStatus() !== 'pending') {
+            if ($orderId && $order->getStatus() &&$order->getStatus() !== 'pending') {
                 $this->saveOrderInitiator($orderId, false);
             } elseif ($order->getData('callcenter_user')) {
                 /** @var Transoft_Callcenter_Model_Initiator $initiatorModel */
                 $initiatorModel = Mage::getSingleton('transoft_callcenter/initiator');
                 $userId = $initiatorModel->getCallcenterUserId();
-                $data[$orderId] = ['status' => true, 'position' => 1];
-                Mage::getResourceSingleton('transoft_callcenter/initiator_order')
-                    ->saveInitiatorRelation($userId, $data);
+                $initiatorModel->addData([
+                    'initiator_id'  => $userId,
+                    'order_id' => $orderId,
+                    'status' => 1,
+                    'position' => 1
+                ]);
+                try {
+                    $initiatorModel->save();
+                } catch (Exception $e) {
+                    Mage::log($e->getMessage());
+                }
             }
         }
     }
