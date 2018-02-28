@@ -27,6 +27,8 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
                 $buttonData['label']   = Mage::helper('transoft_callcenter')->__('Wait order');
                 $buttonData['class'] = 'disabled';
                 unset($buttonData['onclick']);
+                //added js for reload page every 5 min
+                $this->getLayout()->getBlock('head')->addJs('transoft/callcenter/order_grid.js');
             } elseif ($enabledOrderId > 0) {
                 $url = $this->getUrl('*/sales_order/view/', ['order_id' => $enabledOrderId]);
                 $buttonData['onclick'] = 'setLocation(\'' . $url . '\')';
@@ -39,7 +41,6 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
                 100,
                 'header'
             );
-            $this->getLayout()->getBlock('head')->addJs('transoft/callcenter/order_grid.js');
         }
     }
 
