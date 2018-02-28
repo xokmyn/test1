@@ -401,8 +401,11 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
         $resultOrderId = 0;
         foreach ($orderIds as $k => $orderId) {
             /** @var Mage_Sales_Model_Order $order */
-            $order = Mage::app()->getCache()->load($this->orderInitiatorPrefixCache.$orderId) ?:
-                Mage::getModel('sales/order')->load($orderId);
+            if ($cacheOrder = Mage::app()->getCache()->load($this->orderInitiatorPrefixCache.$orderId)) {
+                $order = unserialize($cacheOrder);
+            } else {
+                $order = Mage::getModel('sales/order')->load($orderId);
+            }
             $this->orderCache($order);
             foreach ($order->getAllItems() as $item) {
                 $product = $item->getProduct();
