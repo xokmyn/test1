@@ -45,6 +45,11 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
     protected $callcenterUser;
 
     /**
+     * Order cache prefix
+     */
+    private $orderInitiatorPrefixCache = 'order_initiator_';
+
+    /**
      * @return array
      */
     public function getProcessUserOrder()
@@ -372,6 +377,11 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
                 unset($orderIds[array_search($orderId, $orderIds)]);
             }
         }
+        try {
+            Mage::app()->getCache()->clean('matchingTag', array(self::CACHE_TAG));
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
         $this->processUserOrder = $processData;
     }
 
@@ -391,7 +401,9 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
         $resultOrderId = 0;
         foreach ($orderIds as $k => $orderId) {
             /** @var Mage_Sales_Model_Order $order */
-            $order = Mage::getModel('sales/order')->load($orderId);
+            $order = Mage::app()->getCache()->load($this->orderInitiatorPrefixCache.$orderId) ?:
+                Mage::getModel('sales/order')->load($orderId);
+            $this->orderCache($order);
             foreach ($order->getAllItems() as $item) {
                 $product = $item->getProduct();
                 if ((int)$product->getAttributeSetId() !== (int)$attributeSetId) {
@@ -411,6 +423,21 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
             }
         }
         return $resultOrderId;
+    }
+
+    /**
+     * Add order to cache
+     * @param $order
+     */
+    public function orderCache($order)
+    {
+        $cacheId = 'order_initiator_'.$order->getId();
+        $cacheTag = self::CACHE_TAG;
+        /** @var Mage_Core_Model_Cache $cacheOrder */
+        $cacheOrder = Mage::app()->getCache();
+        if (!$dataToBeCached = $cacheOrder->load($cacheId)) {
+            $cacheOrder->save(serialize($order), $cacheId, array($cacheTag));
+        }
     }
 
     /**
