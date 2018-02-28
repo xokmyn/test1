@@ -386,24 +386,35 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
      */
     protected function getOrderForInitiator($orderIds, $attributeSetId, $type)
     {
+        $orderWithTypeProduct = [];
+        $orderWithoutTypeProduct = [];
+        $resultOrderId = 0;
         foreach ($orderIds as $k => $orderId) {
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->load($orderId);
-            if (!$type) {
-                return $orderId;
-            }
             foreach ($order->getAllItems() as $item) {
                 $product = $item->getProduct();
-                if ((int)$product->getAttributeSetId() === (int)$attributeSetId
+                if ((int)$product->getAttributeSetId() !== (int)$attributeSetId) {
+                    $orderWithoutTypeProduct[$orderId][] = $product->getId();
+                } elseif ((int)$product->getAttributeSetId() === (int)$attributeSetId
                     && (int)$product->getData('callcenter_format_type') === (int)$type) {
-                    return $orderId;
+                    $orderWithTypeProduct[$orderId][] = $product->getId();
                 }
             }
+            if ($type && $orderWithTypeProduct) {
+                $resultOrderId = $orderId;
+                break;
+            }
+            if (!$type && !$orderWithTypeProduct && $orderWithoutTypeProduct) {
+                $resultOrderId = $orderId;
+                break;
+            }
         }
+        return $resultOrderId;
     }
 
     /**
-     * Save initiator order relation
+     * Save order to initiator during distribution
      *
      * @param array $data
      */
@@ -417,7 +428,7 @@ class Transoft_Callcenter_Model_Initiator extends Mage_Core_Model_Abstract
         try {
             $model->save();
         } catch (Exception $e) {
-            Mage::exception($e);
+            Mage::logException($e);
         }
     }
 

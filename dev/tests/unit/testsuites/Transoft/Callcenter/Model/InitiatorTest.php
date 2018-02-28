@@ -2,7 +2,7 @@
 
 class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 {
-    public  $app;
+    public $app;
     private $productAttributeSetId;
     private $optionsProduct;
     private $products;
@@ -425,7 +425,7 @@ class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
         $this->initiatorModel->saveOrderWithProductSetToInitiator($orderIds);
         $arrUserOrder = $this->initiatorModel->getProcessUserOrder();
         //comparison two arrays
-        $this->assertEquals($arrUserOrder, $this->getRightOrderInitiator());
+        $this->assertEquals($arrUserOrder, $rightData);
         foreach ($arrUserOrder as $orderId => $initiatorId) {
             echo 'Callcenter User ' . $initiatorId . ' created get Order ID ' . $orderId . PHP_EOL;
         }

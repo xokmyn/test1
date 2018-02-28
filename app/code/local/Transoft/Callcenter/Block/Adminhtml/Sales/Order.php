@@ -6,7 +6,6 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
     public function __construct()
     {
         parent::__construct();
-        $this->checkAndAddButtons();
     }
 
     protected function checkAndAddButtons()
@@ -40,6 +39,7 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
                 100,
                 'header'
             );
+            $this->getLayout()->getBlock('head')->addJs('transoft/callcenter/order_grid.js');
         }
     }
 
@@ -65,5 +65,11 @@ class Transoft_Callcenter_Block_Adminhtml_Sales_Order extends Mage_Adminhtml_Blo
             'onclick' => 'setLocation(\'' . $this->getOrderUrlForInitiator() . '\')',
             'class'   => 'add',
         ];
+    }
+
+    protected function _prepareLayout()
+    {
+        $this->checkAndAddButtons();
+        return parent::_prepareLayout();
     }
 }
