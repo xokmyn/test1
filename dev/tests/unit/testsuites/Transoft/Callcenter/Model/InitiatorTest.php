@@ -2,7 +2,7 @@
 
 class Transoft_Callcenter_Model_InitiatorTest extends PHPUnit_Framework_TestCase
 {
-    public  $app;
+    public $app;
     private $productAttributeSetId;
     private $optionsProduct;
     private $products;
